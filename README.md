@@ -1,4 +1,4 @@
-# Sustainable Development Web App Builder 2.8 App [live demo](https://adrisolid.github.io/CedarWidget/)
+# Sustainable Development Web App Builder 2.8 App
 
 ![.](https://icrc.maps.arcgis.com/sharing/rest/content/items/096ea39896894ff2b47f745f2e0cb23c/data)
 
