@@ -59,7 +59,7 @@ define([
           this._mode = "/updateFeatures"
         } else{
           new Message({
-            message: 'Please choose one of the following options: "add", "update" or "delete"'
+            message: 'Please choose one of the following options: "add" or "update"'
           });
         } 
 
