@@ -1,0 +1,15 @@
+{
+  "name": "updatePhotos",
+  "platform": "HTML",
+  "version": "2.8",
+  "wabVersion": "2.8",
+  "author": "Adrián Pérez Beneito, ICRC",
+  "description": "",
+  "copyright": "",
+  "license": "",
+  "properties": {
+    "inPanel": false,
+    "hasUIFile": false,
+    "supportMultiInstance": false
+  }
+}
