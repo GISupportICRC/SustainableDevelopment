@@ -15,8 +15,6 @@ define([
           this._mode = "/addFeatures"
         } else if(options.mode == "update"){
           this._mode = "/updateFeatures"
-        } else if(options.mode == "delete"){
-          this._mode = "/deleteFeatures"
         } else{
           new Message({
             message: 'Please choose one of the following options: "add", "update" or "delete"'
