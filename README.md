@@ -1,4 +1,4 @@
-# Sustainable Development WAB 2.8 App 
+# Sustainable Development WAB 2.8 App :seedling: [live demo](https://gisupporticrc.github.io/SustainableDevelopment/)
 
 The atlas catalogues sustainability initiatives implemented around the world by different humanitarian organisations. 
 The sustainability initiatives are colour coded by themes: social (yellow), environmental (green) and economic (blue). 
@@ -9,7 +9,7 @@ humanitarian organisations.
 
 ## Custom Widgets
 
-### ICRCSustainableDevelopmentFilter
+### ICRCFilterSustainableDevelopment
 
 Filtering WebMap Layer using [Dojo Select](https://dojotoolkit.org/reference-guide/1.10/dijit/form/Select.html) and [Bootstrap Toggle](http://www.bootstraptoggle.com/)
 
@@ -23,8 +23,3 @@ for solve the problem. Using a get method for fetch the attachments from the ser
 This off-panel widget executes the update at 'startup'.
 
 ***
-
-
-
-
-
