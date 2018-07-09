@@ -1,8 +1,21 @@
+/**
+  * Update features POSTing to ArcGIS Server.
+  * 
+  * The following class works in both AGOL and your own ArcGIS Server
+  * 
+  * @constructor
+  *
+  * @param {string} 
+  *   POST type: options => 'update'
+  * @param {object} 
+  *   Parameters
+  * @param {string} 
+  *   Server url 
+   */
 define([
     'dojo/_base/declare',
-    'dojo/_base/lang',
-    'esri/request'
-  ], function(declare, lang, esriRequest){
+    'dojo/_base/lang'
+  ], function(declare, lang){
     var clazz = declare(null, {
 
     _mode: null,
@@ -10,8 +23,8 @@ define([
     _url: null,
      
     constructor: function(options){
-        if(options.mode == "add"){
-          this._mode = "/addFeatures"
+        if(options.mode == "update"){
+          this._mode = "/updateFeatures"
         } else{
           console.log('error')
         }
