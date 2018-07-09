@@ -370,8 +370,8 @@ function(BaseWidget,
         callbackParamName: "callback"
       })
       layersRequest.then(
-        lang.hitch(this, function(results){
-          if(results.features != 0){
+        lang.hitch(this, function(response){
+          if(response.features != 0){
             this.layer.setDefinitionExpression((this.sqlDefinition[0] + this.sqlDefinition[1] + this.sqlDefinition[2] + this.sqlDefinition[3]).slice(0, -5));
           }else{
             new Message({
@@ -380,13 +380,15 @@ function(BaseWidget,
             this.layer.setDefinitionExpression()
             this.cleanSqlDefinitionArray()
           }
+        }), lang.hitch(this, function(error){
+              console.log(error.message)
         })).always(lang.hitch(this, function(){
           this.shelter.hide();
         }))
     },
 
     replaceQueryString: function(string){
-      this.confirmQuery(string.replace(/=/g, "%3D").replace(/'/g, "%27").replace(/\s/g, "+"))
+      this.confirmQuery(string.replace(/=/g, "%3D").replace(/'/g, "%27").replace(/\s/g, "+").replace(/&/g, "%26"))
     },
 
     resetFilter: function(){
