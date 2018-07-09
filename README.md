@@ -26,26 +26,24 @@ Use the following Dojo class to post against the server:
 
 ```
 /**
-  * Add or update features POSTing to ArcGIS Server.
+  * Update features POSTing to ArcGIS Server.
   * 
   * The following class works in both AGOL and your own ArcGIS Server
   * 
   * @constructor
   *
   * @param {string} 
-  *   POST type: options => 'update' or 'add'
+  *   POST type: options => 'update'
   * @param {object} 
   *   Parameters
   * @param {string} 
   *   Server url 
    */
-
 define([
     'dojo/_base/declare',
     'dojo/_base/lang',
-    'esri/request',
-    'jimu/dijit/Message'
-  ], function(declare, lang, esriRequest, Message){
+    'esri/request'
+  ], function(declare, lang, esriRequest){
     var clazz = declare(null, {
 
     _mode: null,
@@ -55,37 +53,33 @@ define([
     constructor: function(options){
         if(options.mode == "add"){
           this._mode = "/addFeatures"
-        } else if(options.mode == "update"){
-          this._mode = "/updateFeatures"
         } else{
-          new Message({
-            message: 'Please choose one of the following options: "add" or "update"'
-          });
-        } 
+          console.log('error')
+        }
 
-        this._params = options.features;
+        this._params = JSON.stringify(options.features);
         this._url = options.url;
     },
 
     esriPOST: function(){
-		  var updateparams = "features=" + JSON.stringify(this._params) + "&f=json";
-		  var http;
-		  if(window.XMLHttpRequest){
-		    http = new XMLHttpRequest();
-		  }
-		  else{
-		    http = new ActiveXObject("Msxml2.XMLHTTP");
-		  }
-		  http.open("POST", this._url + this._mode, true);
-		  http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-		  http.onreadystatechange = lang.hitch(this, function(){
-		    if(http.readyState == 4 && http.status == 200) {
-		      console.log(http.responseText);
-		      this.responseAct(http.responseText,'update');
-		    }
-		  });
-		  http.send(updateparams);
-	  },
+	var updateparams = "features=" + this._params + "&f=json";
+	var http;
+	if(window.XMLHttpRequest){
+	  http = new XMLHttpRequest();
+	}
+	else{
+	  http = new ActiveXObject("Msxml2.XMLHTTP");
+	}
+	http.open("POST", this._url + this._mode, true);
+	http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	http.onreadystatechange = lang.hitch(this, function(){
+	  if(http.readyState == 4 && http.status == 200) {
+	    console.log(http.responseText);
+	    this.responseAct(http.responseText,'update');
+	  }
+	});
+	http.send(updateparams);
+	},
 
 
     responseAct: function(httpResponseText,action){
@@ -96,7 +90,7 @@ define([
             var httpResponseFirstKey = httpResponseKeys[0];
             
             if (httpResponseFirstKey == 'addResults' || httpResponseFirstKey == 'updateResults' || httpResponseFirstKey == 
-              'deleteResults') {
+	      'deleteResults') {
                 if (httpResponse[httpResponseFirstKey][0].success === true){
                     switch (action) {
                         case 'add':
@@ -113,8 +107,8 @@ define([
                     /* location.reload(); */
                 }
                 else {
-                    alert ("Error: " + httpResponse[httpResponseFirstKey][0].error.description + " Please report to    
-                      gisupport@icrc.org.");
+                    alert ("Error: " + httpResponse[httpResponseFirstKey][0].error.description + " Please report to 
+		      gisupport@icrc.org.");
                     alerted.alert ='yes';
                 }
             } else if (httpResponseFirstKey == 'error') {
@@ -125,12 +119,13 @@ define([
                     }
                     return detailsText;
                 }
-                alert ("Error: " + httpResponse[httpResponseFirstKey].message + " " +            
-                  listDetails(httpResponse[httpResponseFirstKey].details) + " Please report to gisupport@icrc.org.");
+                alert ("Error: " + httpResponse[httpResponseFirstKey].message + " " + 
+		  listDetails(httpResponse[httpResponseFirstKey].details) + " Please report to gisupport@icrc.org.");
                 alerted.alert ='yes';
             }
         }
-     }
+    }
+  
     });
     return clazz;
   });
