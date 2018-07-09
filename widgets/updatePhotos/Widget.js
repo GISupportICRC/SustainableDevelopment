@@ -65,11 +65,12 @@ define([
       },
 
       updatePhotos: function(results){
+   
          new updatePhotos({
-          mode: 'update', //options: add, update, delete 
-          features: JSON.stringify({"attributes": { "OBJECTID": results[0].objectId,
-                                      "popUpImage"  : "<img src='" + results[0].url + "' alt='' height='150' width='240'>"
-                                   }}),
+          mode: 'update', //options: 'update'
+          features: {"attributes": { "OBJECTID": results[0].objectId,
+                                     "popUpImage"  : "<img src='" + results[0].url + "' alt=''>"
+                                   }},
           url: this.appConfig.projectLayerUrl
         }).esriPOST()
       }
