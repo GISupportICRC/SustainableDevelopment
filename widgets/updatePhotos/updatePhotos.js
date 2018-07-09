@@ -1,9 +1,8 @@
 define([
     'dojo/_base/declare',
     'dojo/_base/lang',
-    'esri/request',
-    'jimu/dijit/Message'
-  ], function(declare, lang, esriRequest, Message){
+    'esri/request'
+  ], function(declare, lang, esriRequest){
     var clazz = declare(null, {
 
     _mode: null,
@@ -13,15 +12,11 @@ define([
     constructor: function(options){
         if(options.mode == "add"){
           this._mode = "/addFeatures"
-        } else if(options.mode == "update"){
-          this._mode = "/updateFeatures"
         } else{
-          new Message({
-            message: 'Please choose one of the following options: "add", "update" or "delete"'
-          });
-        } 
+          console.log('error')
+        }
 
-        this._params = options.features;
+        this._params = JSON.stringify(options.features);
         this._url = options.url;
     },
 
@@ -84,7 +79,6 @@ define([
                 alert ("Error: " + httpResponse[httpResponseFirstKey].message + " " + listDetails(httpResponse[httpResponseFirstKey].details) + " Please report to gisupport@icrc.org.");
                 alerted.alert ='yes';
             }
-            
         }
     }
   
