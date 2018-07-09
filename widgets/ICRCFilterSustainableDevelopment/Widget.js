@@ -263,11 +263,6 @@ function(BaseWidget,
       })));
     },
 
-    updateDateSelects: function(){
-      this.timeObject
-
-    },
-
     cleanSqlDefinitionArray: function(){
       $('input[type=checkbox]').prop('checked', false);
 
