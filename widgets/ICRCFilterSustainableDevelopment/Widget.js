@@ -49,8 +49,14 @@ function(BaseWidget,
       this.inherited(arguments);
       this.initLoadingShelter(); 
       this.getWebMapLayer();
-      this.quering();
-      //this.manageDateTime();
+      this.querying();
+
+      var selects = [this.config.projectField, this.config.regionField, this.config.countryField]
+      for(i in selects){
+        this.querying(selects[i])
+      }
+
+      this.queryingTime();
       this.enableToogleEvents();
     },
 
@@ -75,53 +81,31 @@ function(BaseWidget,
         }))
     },
 
-    quering: function(){
-      var def = new Deferred()
-          def.resolve(':D');
-          def.then(lang.hitch(this, function(){
-            var projectQuery = new Query()
-                projectQuery.where = '1=1';
-                projectQuery.outFields = [this.config.projectField];
-                new QueryTask(this.appConfig.projectLayerUrl).execute(projectQuery, lang.hitch(this, function(results){
-                  var map = results.features.map(lang.hitch(this, function(record){
-                    return record.attributes[this.config.projectField]
-                  }))
-                  this.filteringData(map, this.config.projectField)
-                }))
-          })).then(lang.hitch(this, function(){
-            var regionQuery = new Query()
-                regionQuery.where = '1=1';
-                regionQuery.outFields = [this.config.regionField];
-                new QueryTask(this.appConfig.projectLayerUrl).execute(regionQuery, lang.hitch(this, function(results){
-                  var map = results.features.map(lang.hitch(this, function(record){
-                    return record.attributes[this.config.regionField]
-                  }))
-                  this.filteringData(map, this.config.regionField)
-                }))
-          })).then(lang.hitch(this, function(){
-            var countriesQuery = new Query()
-                countriesQuery.where = '1=1';
-                countriesQuery.outFields = [this.config.countryField];
-                new QueryTask(this.appConfig.projectLayerUrl).execute(countriesQuery, lang.hitch(this, function(results){
-                  var map = results.features.map(lang.hitch(this, function(record){
-                    return record.attributes[this.config.countryField]
-                  }))
-                  this.filteringData(map, this.config.countryField)
-                }))
-          })).then(lang.hitch(this, function(){
-            var timeQuery = new Query()
-                timeQuery.where = '1=1';
-                timeQuery.outFields = ['objectid', this.config.startDateField, this.config.endDateField];
-                new QueryTask(this.appConfig.projectLayerUrl).execute(timeQuery, lang.hitch(this, function(results){
-                  this.timeObject = results.features.map(lang.hitch(this, function(record){
-                    return {
-                      objectid: record.attributes['objectid'],
-                      startDate: new Date(record.attributes[this.config.startDateField]).getFullYear(),
-                      endDate: new Date(record.attributes[this.config.endDateField]).getFullYear()
-                    }
-                  }))
-                  this.manageDateTime(this.timeObject)
-                }))
+    querying: function(field){
+      var query = new Query()
+          query.where = '1=1';
+          query.outFields = [field];
+          new QueryTask(this.appConfig.projectLayerUrl).execute(query, lang.hitch(this, function(results){
+            var map = results.features.map(lang.hitch(this, function(record){
+              return record.attributes[field]
+            }))
+            this.filteringData(map, field)
+          }))
+    },
+
+    queryingTime: function(){
+      var timeQuery = new Query()
+          timeQuery.where = '1=1';
+          timeQuery.outFields = ['objectid', this.config.startDateField, this.config.endDateField];
+          new QueryTask(this.appConfig.projectLayerUrl).execute(timeQuery, lang.hitch(this, function(results){
+            this.timeObject = results.features.map(lang.hitch(this, function(record){
+              return {
+                objectid: record.attributes['objectid'],
+                startDate: new Date(record.attributes[this.config.startDateField]).getFullYear(),
+                endDate: new Date(record.attributes[this.config.endDateField]).getFullYear()
+              }
+            }))
+            this.manageDateTime(this.timeObject)
           }))
     },
 
