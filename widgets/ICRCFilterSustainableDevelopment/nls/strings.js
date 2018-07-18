@@ -1,11 +1,11 @@
 define({
   root: ({
-    _widgetLabel: "ICRC_Filter",
-    themeProject: "theme of the project is",
+    _widgetLabel: "ICRC Filter",
+    themeProject: "Project theme",
     region: "Show projects in this region",
     countries: "Show projects in this country",
-    projectStart: "project START date is on",
-    projectEnd: "project END date is on",
-    resetFilter: "Reset Filter"
+    projectStart: "Project start date",
+    projectEnd: "Project end date",
+    resetFilter: "Reset filter"
   })
 });
