@@ -2,12 +2,7 @@ function startIntro(){
   introJs().setOptions({
     steps: [
       {
-        element: document.querySelector('#dijit__WidgetBase_0'),
-        intro: 'The info widget opens automatically, showing the description of the atlas (see the info widget above).',
-        position: 'right'
-      },
-      {
-        intro: 'This web application present the Humanitarian aid and sustainable development initiatives.'
+        intro: 'Click on location pins to display information about sustainability projects.'
       },
       {
         element: document.querySelector('#addProjectButton'),
@@ -16,12 +11,12 @@ function startIntro(){
       },
       {
         element: document.querySelector('#dijit__WidgetBase_2'),
-        intro: 'The sustainability initiatives are colour coded by themes: social (yellow), environmental (green), economic (blue)',
+        intro: 'The sustainability initiatives are colour coded by themes: social (yellow), environmental (green), economic (blue).',
         position: 'bottom'
       },
       {
         element: document.querySelector('#dijit__WidgetBase_4'),
-        intro: 'The filter widget allows you to browse through sustainability projects by theme, region, country and year.  Slide the button to the right to activate the filter.”',
+        intro: 'The filter widget allows you to browse through sustainability projects by theme, region, country and year.  Slide the button to the right to activate the filter.',
         position: 'right'
       },
       {
