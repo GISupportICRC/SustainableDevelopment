@@ -45,17 +45,18 @@ define([
         })
         layersRequest.then(
           lang.hitch(this, function(results){
-            this.getAttachments(results.features.length);
+              var oidArray = [];
+              for (i in results.features){
+                  oidArray.push(results.features[i].attributes.objectid);
+              }  
+            this.getAttachments(oidArray);
           }))
       },
 
       getAttachments: function(oids){
-        var array = [];
-        for (var i = 0; i < oids; i++) {
-          array.push(i + 1);
-        }
+        var array = oids;
 
-        for(i in array){
+        for(var i = 0; i < array.length; i++){
           this.layer.queryAttachmentInfos(array[i], lang.hitch(this, function(results){
             if(results.length != 0){
               this.updatePhotos(results);
