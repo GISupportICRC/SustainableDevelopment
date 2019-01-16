@@ -196,7 +196,8 @@ LayerInfo, LayerInfoForDefaultWMS, FeatureLayer, esriLang) {
         layerObject: this.layerObject, //the subLayerObject is WMS layer also.
         title: wmsLayerInfo.label || wmsLayerInfo.title || wmsLayerInfo.name || " ",
         // WMS sub layer does not has id, set id to 'parentId' + name.
-        id: this.id + '_' + (wmsLayerInfo.name || "-"),
+        // group layer might does not have wmsLayerInfo.name.
+        id: this.id + '_' + (wmsLayerInfo.name || (wmsLayerInfo.title + "-" + Math.random())),
         subId: wmsLayerInfo.name || "-",
         wms: {"layerInfo": this, "subId": wmsLayerInfo.name || "-", "wmsLayerInfo": wmsLayerInfo},
         selfType: 'wms',

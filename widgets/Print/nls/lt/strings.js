@@ -34,5 +34,7 @@ define({
   "print": "Spausdinti",
   "clearList": "Išvalyti spaudinius",
   "creatingPrint": "Kuriamas spaudinys",
-  "printError": "Klaida, bandykite dar kartą"
+  "printError": "Klaida, bandykite dar kartą",
+  "forceFeatureAttributes": "Elementų atributai",
+  "includeFeatureAttributes": "Apima atributus"
 });

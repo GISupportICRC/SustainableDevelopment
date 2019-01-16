@@ -5,6 +5,12 @@ define({
   "actions": "Konfigurera lagerfält",
   "field": "Fält",
   "alias": "Alias",
+  "url": "URL",
+  "sortField": "Sortera fält",
+  "sortOrderTooltips": {
+    "toDescending": "Ändra till fallande ordning",
+    "toAscending": "Ändra till stigande ordning"
+  },
   "visible": "Synlig",
   "linkField": "Länkfält",
   "noLayers": "Inga geoobjektslager är tillgängliga",

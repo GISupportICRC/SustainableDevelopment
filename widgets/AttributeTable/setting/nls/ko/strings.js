@@ -5,6 +5,12 @@ define({
   "actions": "레이어 필드 구성",
   "field": "필드",
   "alias": "별칭",
+  "url": "URL",
+  "sortField": "정렬 필드",
+  "sortOrderTooltips": {
+    "toDescending": "내림차순으로 변경",
+    "toAscending": "오름차순으로 변경"
+  },
   "visible": "표시",
   "linkField": "링크 필드",
   "noLayers": "피처 레이어를 사용할 수 없음",

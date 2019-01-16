@@ -64,11 +64,13 @@ define([
   'jimu/dijit/LoadingIndicator',
   'jimu/dijit/FieldStatistics',
   'jimu/dijit/Popup',
+  "jimu/dijit/CheckBox",
   'jimu/SelectionManager',
   'jimu/CSVUtils',
   'jimu/utils',
   '../utils',
-  'dojo/query'
+  'dojo/query',
+  'dojo/string'
 ], function(
   declare,
   html,
@@ -120,11 +122,13 @@ define([
   LoadingIndicator,
   FieldStatistics,
   Popup,
+  CheckBox,
   SelectionManager,
   CSVUtils,
   jimuUtils,
   tableUtils,
-  query
+  query,
+  string
 ) {
   return declare([_WidgetBase, Evented], {
     baseClass: 'jimu-widget-attributetable-feature-table',
@@ -633,7 +637,8 @@ define([
           var filter = new Filter({
             noFilterTip: this.nls.noFilterTip,
             style: "width:100%;",
-            featureLayerId: this.layerInfo.id
+            featureLayerId: this.layerInfo.id,
+            runtime: true
           });
 
           var size = this._getFilterPopupSize();
@@ -721,14 +726,18 @@ define([
     },
 
     onExportCSVClick: function() {
+      var richTextFields = this._getRichTextFields();
+      var message = this._getExportCSVPopupMessage(richTextFields);
       var popup = new Message({
-        message: this.nls.exportMessage,
+        'class': this.baseClass + '-popup',
+        message: message,
         titleLabel: this.nls.exportFiles,
         autoHeight: true,
         buttons: [{
           label: this.nls.ok,
           onClick: lang.hitch(this, function() {
-            this.exportToCSV();
+            var check = message._check;
+            this.exportToCSV(null, typeof check !== 'undefined' && !check.checked ? richTextFields : null);
             popup.close();
           })
         }, {
@@ -739,6 +748,92 @@ define([
         layerInfoId: this.layerInfo.id
       });
     },
+
+    _getExportCSVPopupMessage: function(richTextFields) {
+      var messageWrapper = document.createElement('div');
+      messageWrapper.className = 'message-wrapper';
+      messageWrapper.appendChild(document.createTextNode(this.nls.exportMessage));
+
+      // create extra UI elements if rich text field(s) exist(s)
+      if(richTextFields.length) {
+        var richTextInputWrapper = document.createElement('div');
+        richTextInputWrapper.className = 'input-row';
+        // checkbox
+        var check = new CheckBox({
+          label: this.nls.keepRichTextLabel,
+          checked: true // set default to keeping rich text format
+        });
+        // hint button
+        var hintButton = document.createElement('a');
+        hintButton.className = 'hint-button';
+        hintButton.href = '#';
+        hintButton.role = 'button';
+        hintButton.appendChild(document.createTextNode(this.nls.whatsThis));
+        richTextInputWrapper.appendChild(check.domNode);
+        richTextInputWrapper.appendChild(hintButton);
+        messageWrapper.appendChild(richTextInputWrapper);
+        messageWrapper._check = check;
+
+        this.own(on(hintButton, 'click', lang.hitch(this, function(evt) {
+          evt.preventDefault();
+          var options = {
+            'class': this.baseClass + '-popup',
+            message: this._getRichTextMessage(richTextFields)
+          };
+          if(!window.appInfo.isRunInMobile) {
+            options.width = 500;
+          }
+          new Message(options);
+        })));
+      }
+      return messageWrapper;
+    },
+
+    _getRichTextMessage: function(richTextFields) {
+      if(!richTextFields || richTextFields.hasOwnProperty("length") && !richTextFields.length) return "";
+
+      var _EXAMPLE = {
+        preview: '<font color="#31aacd">Web AppBuilder</font> for <u>ArcGIS</u>',
+        withHTMLTags: '&ltfont color=\"#31aacd\"&gtWeb AppBuilder&lt/font&gt for &ltu&gtArcGIS&lt/u&gt',
+        withoutHTMLTags: 'Web AppBuilder for ArcGIS'
+      };
+      var messageWrapper = document.createElement('div');
+      var messageHTML = '', richTextFieldsHTML = '';
+      for(var i = 0, len = richTextFields.length; i < len; i++) {
+        richTextFieldsHTML += '<mark>' + richTextFields[i].fieldName + '</mark>';
+      }
+      messageHTML += '<p>' + string.substitute(this.nls.richTextMessage.explanatoryText.line1, {
+        layerName: '<strong>' + this.layer.name + '</strong>'
+      }) + '</p>';
+      messageHTML += '<div class="tags">' + richTextFieldsHTML + '</div>';
+      messageHTML += '<p>' + this.nls.richTextMessage.explanatoryText.line2 + '</p>' +
+                    '<p>' + this.nls.richTextMessage.explanatoryText.line3 + '</p>'+
+                    '<h3>' + this.nls.richTextMessage.example.label + '</h3>' +
+                    '<div class="example-block"><pre>' + _EXAMPLE.preview + '</pre>' +
+                    this.nls.richTextMessage.example.scenarios.first +
+                    '<pre>' + _EXAMPLE.withHTMLTags + '</pre>' +
+                    this.nls.richTextMessage.example.scenarios.second +
+                    '<pre>' + _EXAMPLE.withoutHTMLTags + '</pre></div>';
+      messageWrapper.innerHTML = messageHTML;
+      return messageWrapper;
+    },
+
+    // get fields that display as rich text fields
+    _getRichTextFields: function() {
+      var pInfos = this.layerInfo && this.layerInfo.getPopupInfo && this.layerInfo.getPopupInfo(),
+          lFields = pInfos && pInfos.fieldInfos,
+          rFields = [];
+      if(lFields) {
+        for(var i = 0, len = lFields.length; i < len; i++) {
+          var lField = lFields[i];
+          if(lField.stringFieldOption && lField.stringFieldOption === "richtext") {
+            rFields.push(lField);
+          }
+        }
+      }
+      return rFields;
+    },
+
 
     onSelectionComplete: function() {
       var features = this.layer && this.layer.getSelectedFeatures();
@@ -751,6 +846,10 @@ define([
         this.clearSelection(false);
         this._updateSelectRowsByFeatures(features);
       }
+    },
+
+    onSelectionClear: function() {
+      this.clearSelection(false);
     },
 
     changeToolbarStatus: function() {
@@ -953,7 +1052,7 @@ define([
       });
     },
 
-    exportToCSV: function(fileName) {
+    exportToCSV: function(fileName, richTextFieldsToClear) {
       if (!this.layerInfo || !this.layer || !this.tableCreated) {
         return;
       }
@@ -1020,6 +1119,8 @@ define([
             // the conversion on the server side
             options.outSpatialReference = !isSameProjection &&
               lang.clone(this.layer.fullExtent.spatialReference);
+            // pass in rich text fields to be cleared:
+            options.richTextFieldsToClear = richTextFieldsToClear;
 
             return CSVUtils.exportCSVFromFeatureLayer(
               fileName || this.configedInfo.name,
@@ -1219,6 +1320,8 @@ define([
 
         this._selectionHandles.push(
           on(layer, 'selection-complete', lang.hitch(this, 'onSelectionComplete')));
+        this._selectionHandles.push(
+          on(layer, 'selection-clear', lang.hitch(this, 'onSelectionClear')));
       }
       return objectDef.then(lang.hitch(this, function(layerObject) {
         var def = new Deferred();
@@ -1850,8 +1953,13 @@ define([
         }
       }
 
-      if (this.layer.objectIdField) {
-        this.grid.set('sort', this.layer.objectIdField, false);
+      // apply sort option if no one has been applied
+      if(!this.grid.get('sort')[0]) {
+        if(this.configedInfo && this.configedInfo.sortField) {
+          this.grid.set('sort', this.configedInfo.sortField, this.configedInfo.isDescending);
+        } else if (this.layer.objectIdField) {
+          this.grid.set('sort', this.layer.objectIdField, false);
+        }
       }
 
       // fix dgrid bug

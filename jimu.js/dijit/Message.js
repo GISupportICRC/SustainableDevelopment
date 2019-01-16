@@ -42,6 +42,8 @@ define(['dojo/_base/declare',
       maxWidth: 350,
       maxHeight: 180,
 
+      customZIndex: null, //optional
+
       postMixInProperties: function() {
         this.content = this.message;
       },
@@ -77,5 +79,6 @@ define(['dojo/_base/declare',
         html.setStyle(this.domNode, 'zIndex', count + baseIndex + 1);
         html.setStyle(this.overlayNode, 'zIndex', count + baseIndex);
       }
+
     });
   });

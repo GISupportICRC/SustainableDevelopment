@@ -47,9 +47,9 @@ define([
     mo.getDeployContextFromLocation = function (){
       var url = window.location.href.split("?")[0];
 
-      var keyIndex = url.indexOf("/home");
+      var keyIndex = url.indexOf("/home/");
       if(keyIndex < 0){
-        keyIndex = url.indexOf("/apps");
+        keyIndex = url.indexOf("/apps/");
       }
       var context = url.substring(url.indexOf(window.location.host) +
        window.location.host.length + 1, keyIndex);

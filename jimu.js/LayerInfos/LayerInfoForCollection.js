@@ -20,8 +20,9 @@ define([
   'dojo/_base/lang',
   'dojo/promise/all',
   'esri/lang',
+  'jimu/utils',
   './LayerInfo'
-], function(declare, array, lang, all, esriLang, LayerInfo) {
+], function(declare, array, lang, all, esriLang, jimuUtils, LayerInfo) {
   return declare(LayerInfo, {
 
     constructor: function( /*operLayer, map*/ ) {
@@ -64,7 +65,7 @@ define([
 
       return all(_extentDefs).then(lang.hitch(this, function(extents) {
         array.forEach(extents, function(ext) {
-          if(ext) {
+          if(jimuUtils.isValidExtent(ext)) {
             extent = extent ? extent.union(ext) : ext;
           }
         }, this);

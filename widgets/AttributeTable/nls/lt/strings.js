@@ -40,5 +40,21 @@ define({
   "sortDes": "Rūšiuoti mažėjimo tvarka",
   "statistics": "Statistika",
   "attachments": "Priedai",
-  "files": "failai"
+  "files": "failai",
+  "keepRichTextLabel": "Išlaikyti raiškiojo teksto formatą",
+  "whatsThis": "Kas tai?",
+  "richTextMessage": {
+    "explanatoryText": {
+      "line1": "Sluoksnis ${layerName} apima šiuos raiškiojo teksto laukus: ",
+      "line2": " kurie gali apimti teksto formatavimo stilius, pvz., šriftus, spalvas ar teksto dydžius.",
+      "line3": "Eksportavus į CSV, šie formatavimo stiliai bus išlaikyti HTML raktažodžių pavidalu. Galite pasirinkti neišlaikyti raiškiojo teksto formato panaikindami žymę \"Išlaikyti raiškiojo teksto formatą\"."
+    },
+    "example": {
+      "label": "Pavyzdžiui:",
+      "scenarios": {
+        "first": "pagal numatytuosius nustatymus bus eksportuotas kaip šis tekstas:",
+        "second": "ir šis tekstas be raiškiojo teksto formato:"
+      }
+    }
+  }
 });

@@ -5,6 +5,12 @@ define({
   "actions": "Cấu hình trường của lớp dữ liệu",
   "field": "Trường",
   "alias": "Bí danh",
+  "url": "URL",
+  "sortField": "Sắp xếp theo trường",
+  "sortOrderTooltips": {
+    "toDescending": "Thay đổi thứ tự sắp xếp thành giảm dần",
+    "toAscending": "Thay đổi thứ tự sắp xếp thành tăng dần"
+  },
   "visible": "Hiển thị",
   "linkField": "Trường liên kết",
   "noLayers": "Không có lớp đối tượng nào",

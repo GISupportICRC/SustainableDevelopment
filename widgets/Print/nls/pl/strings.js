@@ -34,5 +34,7 @@ define({
   "print": "Drukuj",
   "clearList": "Wyczyść wydruki",
   "creatingPrint": "Tworzenie wydruku",
-  "printError": "Błąd, spróbuj ponownie"
+  "printError": "Błąd, spróbuj ponownie",
+  "forceFeatureAttributes": "Atrybuty obiektów",
+  "includeFeatureAttributes": "Dodaj atrybuty"
 });

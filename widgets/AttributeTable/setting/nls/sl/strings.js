@@ -5,6 +5,12 @@ define({
   "actions": "Konfigurirajte polja slojev",
   "field": "Polje",
   "alias": "Vzdevek",
+  "url": "URL",
+  "sortField": "Razvrsti polje",
+  "sortOrderTooltips": {
+    "toDescending": "Spremeni na padajoč vrstni red",
+    "toAscending": "Spremeni na naraščajoč vrstni red"
+  },
   "visible": "Vidno",
   "linkField": "Polje povezave",
   "noLayers": "Geoobjektni sloji niso na voljo",

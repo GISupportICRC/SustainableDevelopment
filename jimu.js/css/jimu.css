@@ -1031,6 +1031,7 @@ css for the dijits
   opacity: 0;
   overflow: hidden;
 }
+
 .jimu-popup > .title{
   height: 40px;
   padding: 0 10px;
@@ -1062,6 +1063,11 @@ css for the dijits
   font-size: 16px;
   overflow-x: hidden;
   overflow-y: auto;
+}
+.jimu-popup .content .subTitle{
+  opacity: 0.6;
+  font-size: 13px;
+  margin-bottom: 6px;
 }
 .jimu-popup .content-absolute{
   position: absolute;
@@ -2357,6 +2363,11 @@ html.hr .jimu-filter .allExpsBox > div{
   padding:0;
   height: 100%;
   height: 100% !important;
+  text-align: left; /*#13348*/
+}
+
+.jimu-rtl .jimu-single-filter .dijit-form-ValidationTextBox>div.dijitInputField>input.dijitInputInner{
+  text-align: right;
 }
 
 .jimu-single-filter .dijit-form-NumberTextBox>div.dijitInputField{
@@ -2369,6 +2380,12 @@ html.hr .jimu-filter .allExpsBox > div{
   height: 100%;
   padding:0 !important;
   height: 100% !important;
+  text-align: left;
+}
+
+.jimu-rtl .jimu-single-filter .dijit-form-NumberTextBox>div.dijitInputField>input.dijitInputInner{
+  text-align: right;
+  /* direction: rtl; */
 }
 
 .jimu-single-filter .dijit-form-DateTextBox>.dijitRight{
@@ -2448,6 +2465,10 @@ html.hr .jimu-filter .allExpsBox > div{
   min-width: 120px;
   z-index: 1;
 }
+.jimu-filter-parameters .value-type-popup{
+  background: #FFFFFF;
+  box-shadow: 0 0 8px 0 rgba(0,0,0,0.30);
+}
 .jimu-filter .value-type-popup ul{
   padding: 0 10px;
 }
@@ -2478,6 +2499,40 @@ html.hr .jimu-filter .allExpsBox > div{
 .jimu-filter .value-type-popup li.selected span:nth-child(2){
   display: inline-block;
 }
+
+/***filter setInputType popup(six types)***/
+.jimu-filter .value-type-popup-new {
+  min-width: 165px;
+}
+.jimu-filter .value-type-popup-new ul {
+  /* padding: 0 3px; */
+}
+.jimu-filter .value-type-popup-new li {
+  word-break: break-all;
+}
+.jimu-filter .value-type-popup-new li span{
+  /* word-break: keep-all; */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  vertical-align: middle; /*fixed that : overflow: hidden; will add 5px in one li */
+}
+.jimu-filter .value-type-popup-new li span:nth-child(1){
+  width: 120px;
+}
+.jimu-filter .value-type-popup-new li span:nth-child(2) {
+  /* margin-left: 1px; */
+}
+
+/*
+.claro .dojoxCheckedMultiSelect .dojoxCheckedMultiSelectWrapper{
+  width: 100%;
+  height: 98%;
+  overflow-y: auto;
+  border: 0;
+  background: none;
+}
+*/
 /* .desktop-mode for Filter */
 .jimu-filter.desktop-mode{
   max-width: 830px;
@@ -3091,6 +3146,42 @@ html.hr .jimu-filter .allExpsBox > div{
   background-color: #e84b4b;
   -ms-filter: "Alpha(opacity=40)";
   filter: Alpha(opacity=40);
+}
+
+/* css for dijit listvalueprovider noDataTips at runtime */
+.jimu-filter-list-value-provider-tip-container{
+  position: relative;
+  width: 100%;
+  height: 20px;
+}
+
+.jimu-filter-list-value-provider-tip-container .error-tip-section{
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  line-height: 25px;
+}
+
+.jimu-filter-list-value-provider-tip-container .error-tip-section .jimu-icon-error{
+  vertical-align: top;
+  margin-top: 4px;
+}
+
+.jimu-filter-list-value-provider-tip-container .jimu-state-error-text{
+  color: #ff0000;
+  display: inline-block;
+  font-size: 12px;
+  margin-left: 5px;
+  width: 85%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jimu-rtl .jimu-filter-list-value-provider-tip-container .jimu-state-error-text{
+  margin-left: 0;
+  margin-right: 10px;
 }
 
 /* css for dijit LayerChooserFromMap */
@@ -3871,6 +3962,11 @@ html.hr .jimu-filter .allExpsBox > div{
   padding:0;
   height: 100%;
   height: 100% !important;
+  text-align: left; /*#13348*/
+}
+
+.jimu-rtl .jimu-single-filter-parameter .dijit-form-ValidationTextBox>div.dijitInputField>input.dijitInputInner{
+  text-align: right;
 }
 
 .jimu-single-filter-parameter .dijit-form-NumberTextBox>div.dijitInputField{
@@ -3883,6 +3979,11 @@ html.hr .jimu-filter .allExpsBox > div{
   height: 100%;
   padding:0 !important;
   height: 100% !important;
+  text-align: left; /*#13348*/
+}
+
+.jimu-rtl .jimu-single-filter-parameter .dijit-form-NumberTextBox>div.dijitInputField>input.dijitInputInner{
+  text-align: right;
 }
 
 .jimu-single-filter-parameter .dijit-form-DateTextBox>.dijitRight{
@@ -5879,6 +5980,7 @@ html.hr .jimu-filter .allExpsBox > div{
 .jimu-data-preview-table{
   font-size: 12px;
 }
+
 .jimu-popup.data-preview-popup .content,
 .jimu-popup.data-preview-popup .table-container{
   overflow-x: auto;
@@ -6004,7 +6106,7 @@ html.hr .jimu-filter .allExpsBox > div{
 /* toggle button*/
 .jimu-toggle-button{
   width: 34px;
-  height: 20px;
+  height: 19px;
   background: #999;
   border-radius: 10px;
   cursor: pointer;
@@ -6027,6 +6129,640 @@ html.hr .jimu-filter .allExpsBox > div{
   float: left;
 }
 
+/* multiple select*/
+/*add btn-suming
+.jimu-filter-popup-btn .add-btn{
+  display: inline-block;
+  width: 387px;
+  padding: 0 10px;
+  height: 32px;
+  background-color: #24B5CC;
+  color: #ffffff;
+  text-align: center;
+  cursor: pointer;
+}
+
+.jimu-filter-popup-btn .add-btn-right{
+  width: 153px;
+  float: right;
+}
+
+.jimu-filter-popup-btn .add-btn:hover{
+  background-color: #0090A7;
+}
+
+.jimu-filter-popup-btn .add-btn > div{
+  display: inline-block;
+  cursor: pointer;
+  height: 32px;
+  line-height: 32px;
+  font-size: 12px;
+}
+*/
+
+
+.jimu-multiple-set-container .items-list-header,
+.jimu-multiple-set-container .items-list-content{
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 72px;
+  bottom: 30px;
+  overflow: auto;
+  padding: 0 20px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.jimu-multiple-set-container .items-list-header{
+  top: 30px;
+  bottom: auto;
+  overflow: hidden;
+  /* border-top: 1px solid #999999; */
+  border-bottom: 1px solid #999999;
+}
+
+.jimu-multiple-set-container .items-list-content .item{
+  position: relative;
+  width: 100%;
+  height: 40px;
+  border-top: 1px solid #F3F3F3;
+  cursor: pointer;
+}
+
+.jimu-multiple-set-container .items-list-content .item > *{
+  cursor: pointer;
+}
+
+.jimu-multiple-set-container .items-list-content .item:first-child{
+  border-top: 0;
+}
+
+.jimu-multiple-set-container .items-list-content .item .label{
+  display: inline-block;
+  width: 250px;
+  line-height: 40px;
+  /* font-family: AvenirNext-Regular; */
+  font-size: 14px;
+  color: #000000;
+  letter-spacing: 0.39px;
+  margin-right: 10px;
+}
+.jimu-rtl .jimu-multiple-set-container .items-list-content .item .label{
+  margin-right: 0;
+  margin-left: 7px;
+}
+.jimu-rtl .jimu-multiple-set-container .items-list-content .item .label:last-child {
+  margin-right: 0;
+}
+.jimu-rtl .jimu-multiple-set-container .items-list-content .item .lableR {
+  text-align: left;
+}
+.jimu-multiple-set-container .items-list-content .item.custom .label {
+  color: #999;
+  font-style: italic;
+}
+.jimu-multiple-set-container .items-list-content .item .label:last-child{
+  margin-right: 0;
+}
+.jimu-multiple-set-container .items-list-content .item .lableR{
+  text-align: right;
+}
+
+.jimu-multiple-set-container .items-list-header .item .label{
+  /* font-family: AvenirNext-Medium; */
+  font-size: 14px;
+  color: #000000;
+  letter-spacing: 0.39px;
+  /* font-weight: bold; */
+}
+
+.jimu-multiple-set-container .items-list-content .item .label .updateInputDiv{
+  /* width: 245px;
+  height:31px;
+  margin-left: 1px;
+  position: relative;
+  border: 1px solid #999; */
+}
+.jimu-multiple-set-container .items-list-content .item .label .inputDiv{
+  display: inline-block;
+  width: 226px;
+}
+.jimu-multiple-set-container .items-list-content .item .label .inputDiv .dijitTextBox{
+  /* border-color: #fff;
+  position: absolute;
+  right: 5px;
+  top: 5px; */
+}
+
+/*
+.jimu-multiple-set-container .items-list-content .item .label .searchBtn{
+  margin-left: 1px;
+  vertical-align: middle;
+}*/
+
+.jimu-multiple-set-container .items-list-content .item .label .searchBtn{
+  display: inline-block;
+  border: 1px solid #dadada;
+  border-left: none;
+  width: 20px;
+  height: 30px;
+  vertical-align: middle;
+
+  /* display: inline-block;
+  width: 20px;
+  height: 30px;
+  position: absolute;
+  right: 0;
+  top: 0px; */
+}
+.jimu-rtl .jimu-multiple-set-container .items-list-content .item .label .searchBtn{
+  border-left: 1px solid #dadada;
+  border-right: none;
+}
+.jimu-multiple-set-container .items-list-content .item .label .searchBtn .jimu-icon{
+  margin: 5px;
+}
+
+/* .jimu-multiple-set-container .items-list-content .item .updateInputDiv input {
+  width: 100%;
+  padding: 5px 3px;
+} */
+.jimu-multiple-set-container .items-list-content .item .checkbox,
+.jimu-multiple-set-container .items-list-content .item .radio,
+.jimu-multiple-set-container .items-list-content .item .checkboxHeader,
+.jimu-multiple-set-container .items-list-content .item .actions,
+.jimu-multiple-set-container .items-list-content .item .lableR{
+  width: 70px;
+}
+
+.jimu-multiple-set-container .items-list-content .item .label.checkbox,
+.jimu-multiple-set-container .items-list-content .item .label.radio{
+  height: 16px;
+  margin-left: 10px;
+  margin-bottom: 12px;
+  /* background-image: url(images/checkbox_default.png); */
+  background-repeat: no-repeat;
+  background-position-x: left;
+}
+
+.jimu-multiple-set-container .items-list-content .item .label.checkbox{
+  background-image: url(images/checkbox_default.png);
+}
+.jimu-multiple-set-container .items-list-content .item .label.checkbox.checked{
+  background-image: url(images/checked_default.png);
+}
+.jimu-multiple-set-container .items-list-content .item .label.radio{
+  background-image: url(images/radio_normal.png);
+}
+.jimu-multiple-set-container .items-list-content .item .label.radio.checked{
+  background-image: url(images/radio_selected.png);
+}
+.jimu-multiple-set-container .items-list-content .item .actions{
+  position: relative;
+  height: 100%;
+  right: 10px;
+  overflow: hidden;
+  background-color: #FFFFFF;
+}
+
+.jimu-multiple-set-container .items-list-content .item:hover .actions{
+  display: block;
+}
+
+.jimu-multiple-set-container .items-list-content .item .action{
+  width: 12px;
+  height: 12px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  position: relative;
+  top: 14px;
+  cursor: pointer;
+  margin: 0 5px;
+}
+
+.jimu-multiple-set-container .items-list-content .item .action.up{
+  background-image: url(images/filter/up_normal.png);
+}
+
+.jimu-multiple-set-container .items-list-content .item .action.up:hover{
+  background-image: url(images/filter/up_hover.png);
+}
+
+.jimu-multiple-set-container .items-list-content .item .action.down{
+  background-image: url(images/filter/down_normal.png);
+}
+
+.jimu-multiple-set-container .items-list-content .item .action.down:hover{
+  background-image: url(images/filter/down_hover.png);
+}
+
+.jimu-multiple-set-container .items-list-content .item .action.delete{
+  background-image: url(images/filter/delete_normal.png);
+}
+
+.jimu-multiple-set-container .items-list-content .item .action.delete:hover{
+  background-image: url(images/filter/delete_hover.png);
+}
+
+.jimu-multiple-set-container .items-list-content .item:first-child .action.up{
+  display: none;
+}
+
+.jimu-multiple-set-container .items-list-content .item:last-child .action.down{
+  display: none;
+}
+
+.jimu-rtl .jimu-multiple-set-container .items-list-content .item .label.checkbox,
+.jimu-rtl .jimu-multiple-set-container .items-list-content .item .label.radio{
+  margin-right: 10px;
+  background-position-x: right;
+}
+.jimu-rtl .jimu-multiple-set-container .items-list-content .item .actions{
+  right: auto;
+  left: 10px;
+}
+/*layer multiselect option cbx
+ style works in both jimu-popup and widget
+*/
+.jimu-multiple-items-list .item{
+  line-height: 30px;
+  cursor: pointer;
+  padding-left: 10px;
+  /* border-bottom: 1px solid #d9dde0; */
+}
+.jimu-multiple-items-list .item:last-child{
+  /* border-bottom: none; */
+}
+.jimu-multiple-items-list .item .checkbox{
+  width: 20px;
+  height: 16px;
+  vertical-align: middle;
+  background-image: url(images/checkbox_default.png);
+  background-repeat: no-repeat;
+  display: inline-block;
+  /* margin-left: 10px; */
+}
+.jimu-rtl .jimu-multiple-items-list .item{
+  padding-left: 0;
+  padding-right: 10px;
+}
+.jimu-multiple-items-list .item .checkbox.checked{
+  background-image: url(images/checked_default.png);
+}
+.jimu-multiple-items-list .item .radio{
+  width: 20px;
+  height: 16px;
+  /* vertical-align: middle; */
+  background-image: url(images/radio_normal.png);
+  background-repeat: no-repeat;
+  /* display: inline-block; */
+  display: none; /*hide radio in UI for setting*/
+  /* margin-left: 10px;
+  margin-right: 10px; */
+}
+.jimu-multiple-items-list .item .radio.checked{
+  background-image: url(images/radio_selected.png);
+}
+.jimu-multiple-items-list .item .label{
+  font-size: 12px;
+  max-width: 167px;
+  /* line-height: 14px; */
+  vertical-align: middle;
+  display: inline-block;
+}
+.jimu-multiple-items-list .item .labelBig{
+  max-width: 190px;
+}
+.jimu-multiple-items-list .item .labelRuntime{
+  max-width: 280px;
+}
+.jimu-popup .jimu-list-multiple-select .searchKeyInput {
+  margin: 2px 10px;
+}
+.jimu-panel-content .jimu-list-multiple-select .items-content {
+  /* height: 470px; for jimu-popup */
+  padding: 5px;
+  border: 1px solid #999;
+
+}
+.jimu-popup .jimu-list-multiple-select .items-content.items-setting-popup-content {
+  height: 480px;
+}
+.jimu-popup .jimu-list-multiple-select .items-content.items-setting-dropdown-content {
+  height: 286px;
+}
+.jimu-popup .jimu-list-multiple-select .items-content.items-setting-dropdown-content .jimu-multiple-items-list{
+  /* margin: 0 3px; */
+}
+.jimu-popup .jimu-list-multiple-select .items-content.items-setting-dropdown-content.items_content_no_selected_toggle {
+  height: 301px;
+}
+.jimu-panel-content .jimu-list-multiple-select .items-content.items-widget-content {
+  /* height: 300px; */
+  max-height:225px;
+}
+.jimu-panel-content .jimu-list-multiple-select .items-content {
+  margin-top: 0;
+}
+.jimu-list-multiple-select .items-content.loading {
+  /* background-image: url('images/loading.gif');
+  background-repeat: no-repeat;
+  background-position: center 10px;
+  background-position-y: center; */
+}
+.multiple-Select{
+  width:100%;
+  height:30px;
+}
+/*expaned style at runtime*/
+.jimu-panel-content .jimu-list-multiple-select .items-content.items-widget-expaned-content {
+  border: 0;
+}
+.jimu-multiple-items-expanded-list {
+  background: #f3f3f3;
+}
+.jimu-multiple-items-expanded-list .item {
+  padding: 3px 5px;
+  margin: 0 auto;
+  margin-bottom: 5px;
+  background: #fff;
+  border-bottom: none;
+}
+.jimu-multiple-items-expanded-list .item .checkbox{
+  vertical-align: text-bottom;
+}
+.jimu-multiple-items-expanded-list .item .radio{
+  vertical-align: text-bottom;
+  display: inline-block;
+}
+.jimu-multiple-items-expanded-list .item .label{
+  font-size: 12px;
+  line-height: 10px;
+  height: 10px;
+}
+.jimu-rtl .jimu-multiple-items-list .item .label{
+  margin-right: 3px;
+}
+.jimu-panel-content .jimu-list-multiple-select .items-widget-content{
+  padding: 0;
+  background: #f3f3f3;
+}
+.jimu-list-multiple-select .selectedContainer{
+  position: absolute;
+  height: 324px;
+  width: 100%;
+  background: rgb(255, 255, 255);
+  z-index: 1;
+  overflow-y: auto;
+  display: none;
+}
+/*load more and no data in list multiple list*/
+.jimu-list-multiple-select .jimu-list-multiple-select-Tips{
+  /* font-family: AvenirNext-Regular; */
+  font-size: 12px;
+  color: #333333;
+  margin-top: 5px;
+  margin-left: 10px;
+  margin-right: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display:none;
+}
+.jimu-list-multiple-select .jimu-list-multiple-select-Tips.no-data-Tips{
+  font-style: italic;
+}
+.jimu-list-multiple-select .jimu-list-multiple-select-Tips.load-more-data-Tips{
+  cursor: pointer;
+  /* text-align: center; */
+  color: #24B5CC;
+  text-decoration: underline;
+  text-decoration-color: #24B5CC;
+}
+.jimu-list-multiple-select .jimu-list-multiple-select-Tips.load-more-data-Tips:hover{
+  color:#0090A8;
+  text-decoration-color: #0090A8;
+}
+
+/*show selected toggle*/
+.jimu-list-multiple-select .selectedToggleDiv{
+  margin-top: 5px;
+  height: 30px;
+  position: relative;
+  border-top: 1px solid #d9dde0;
+}
+.jimu-list-multiple-select .selectedToggleDiv .selectedToggle{
+  display: inline-block;
+  position: absolute;
+  top: 5px;
+  left: 10px;
+}
+.jimu-list-multiple-select .selectedToggleDiv .toggleTxt{
+  font-size: 12px;
+  line-height: 30px;
+  display: inline-block;
+  vertical-align: middle;
+  word-break: break-word;
+  padding-left: 50px;
+  max-width: 200px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.jimu-rtl .jimu-list-multiple-select .selectedToggle{
+  left: auto;
+  right: 10px;
+}
+.jimu-rtl .jimu-list-multiple-select .selectedToggleDiv .toggleTxt{
+  padding-left: 0;
+  padding-right: 50px;
+}
+
+/*pageControl*/
+.pageControl .pageItem {
+  float: left;
+  line-height: 21px;
+  padding: 2px 3px;
+  text-align: center;
+  cursor: pointer;
+}
+.pageControl .pageBtn {
+  background: #86d5e3;
+  width: 74px;
+  padding: 3px;
+  /* line-height: 21px; */
+  border-radius: 5px;
+}
+.pageControl .pageBtn.pageDisabled {
+  background: #f0f0f0;
+}
+
+/*filter indexButtonProvider -- check btn*/
+.checkBtn{
+  position: relative;
+  width: 100%;
+  height: 30px;
+  padding-left: 6px;
+  line-height: 30px;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #999;
+}
+.checkBtn .checkedNumDiv, .checkBtn .checkedNameDiv{
+  display: none;
+  text-align: left;
+}
+.checkBtn .checkedNumDiv .checkedNum{
+  padding: 0 5px;
+}
+.checkBtn .checkedNameDiv{
+  width: 200px;
+}
+.checkBtn .checkBtnDownIcon{
+  position: absolute;
+  right: 5px;
+  top: 10px;
+}
+.jimu-panel .checkBtn .checkedNameDiv{
+  width: 305px;
+}
+.jimu-panel .checkBtn .checkedNameDiv.checkedEmptyNameDiv{
+  color: #666;
+}
+.jimu-rtl .checkBtn .checkedNumDiv, .jimu-rtl .checkBtn .checkedNameDiv{
+  text-align: right;
+  padding-right: 5px;
+}
+.jimu-rtl .checkBtn .checkBtnDownIcon{
+  right: auto;
+  left: 5px;
+}
+.jimu-list-multiple-select{
+  overflow-y: hidden;
+}
+.jimu-list-multiple-select .items-content{
+  margin-top: 3px;
+  overflow-y: auto;
+}
+.jimu-list-multiple-select .items-content .item {
+  /* border-bottom: 1px solid #d9dde0; */
+}
+.jimu-list-multiple-select .items-content .item.emptyItem{
+  color: #666;
+}
+.jimu-list-multiple-select .items-content .item.active {
+  color: #fff;
+  background: #999;
+}
+.jimu-list-multiple-select .items-content .item:last-child {
+  border-bottom: none;
+}
+.jimu-list-multiple-select .items-content .createNewItem{
+  color: white;
+  background: #99dfea;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 40px;
+  margin-top: 5px;
+  text-align: center;
+  cursor: pointer;
+  display: none;
+}
+.jimu-list-multiple-select .items-content .createNewItem:hover {
+  color: #fff;
+  background: #24b5cc;
+}
+
+.jimu-popup .add-label-btn{
+  width: auto;
+  height: 28px;
+  padding-left: 5px;
+  text-align: left;
+  display: inline-block;
+  color: #24B5CC;
+  cursor: pointer;
+  position: relative;
+}
+
+.jimu-popup .add-label-btn:hover{
+  /* background-color: #0090A7; */
+}
+
+.jimu-popup .add-label-btn > div{
+  display: inline-block;
+  cursor: pointer;
+  height: 28px;
+  line-height: 28px;
+  font-size: 14px;
+}
+
+.jimu-popup .add-label-btn .icon{
+  position: absolute;
+  top: 7px;
+  left: 0;
+  width: 13px;
+  height: 13px;
+  background: url(images/add.png) center center no-repeat;
+  background-size: contain;
+}
+
+.jimu-popup .add-label-btn .tip{
+  position: absolute;
+  left: 18px;
+  max-width: 710px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jimu-rtl .jimu-popup .add-label-btn .icon{
+  left: auto;
+  right: 0;
+}
+.jimu-rtl .jimu-popup .add-label-btn .tip{
+  left: auto;
+  right: 18px;
+}
+
+/*list multiple value provider *** display types*/
+.jimu-popup .displayTypes{
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+}
+.jimu-popup .displayTypes div{
+  font-size: 14px;
+  cursor: pointer;
+  display:inline-block;
+}
+.jimu-popup .displayTypes .title{
+  font-weight: bold;
+}
+.jimu-popup .displayTypes .option .radio{
+  width: 20px;
+  height: 16px;
+  margin-left: 10px;
+  background-image: url(images/radio_normal.png);
+  background-repeat: no-repeat;
+  background-position-x: left;
+}
+.jimu-popup .displayTypes .option.checked .radio{
+  background-image: url(images/radio_selected.png);
+}
+.jimu-popup .displayTypes .option .label{
+  width: auto;
+  min-width: 130px;
+  color: #000000;
+  /* font-family: AvenirNext-Regular; */
+  letter-spacing: 0.39px;
+}
+
 /* to mirror item under RTL */
 .jimu-rtl .jimu-flipx {
   -moz-transform: scaleX(-1);
@@ -6035,3 +6771,71 @@ html.hr .jimu-filter .allExpsBox > div{
   transform: scaleX(-1);
   filter: FlipH;/*IE*/
 }
+
+/*editTable row name update input*/
+.updateInput {
+  /* background: #eee; */
+}
+
+.updateInput input {
+  line-height: 18px;
+  width: 75px;
+}
+
+.updateInput div {
+  border: 1px solid #333;
+}
+
+.updateInput span {
+  display: inline-block;
+  /* background: #e9e2e2; */
+  height: 24px;
+  vertical-align: middle;
+  line-height: 25px;
+  padding: 0 2px;
+}
+
+/*css circle loading*/
+@keyframes jimu-circle-loading {
+  to {transform: rotate(360deg);}
+}
+
+.jimu-circle-loading:before {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  margin-left: -10px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  border-top-color: #7b7777;
+  animation: jimu-circle-loading .8s linear infinite;
+}
+
+.jimu-circle-loading.loading-center:before {
+  left: 50%;
+}
+.jimu-rtl .jimu-circle-loading:before {
+  right: auto;
+  left: 25px;
+}
+.jimu-rtl .jimu-circle-loading.loading-center:before {
+  left: 50%;
+}
+
+/* Mult-selector */
+.dijitMenuPopup .dojoxCheckedMultiSelectMenu .dijitMenuItem .dojoxCheckedMultiSelectMenuCheckBoxItemIcon{
+  background-image: url(sprite.png);
+  border-radius: 2px;
+  background-position: -0px -102px;
+  width: 16px;
+  height: 16px;
+}
+.dijitMenuPopup .dojoxCheckedMultiSelectMenu .dijitMenuItem.dojoxCheckedMultiSelectMenuItemChecked .dojoxCheckedMultiSelectMenuCheckBoxItemIcon{
+  background-position: -0px -123px;
+}
+/* Mult-selector */

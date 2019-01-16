@@ -5,6 +5,12 @@ define({
   "actions": "הגדר שדות שכבה",
   "field": "שדה",
   "alias": "כינוי לתצוגה",
+  "url": "כתובת URL",
+  "sortField": "שדה מיון",
+  "sortOrderTooltips": {
+    "toDescending": "שנה לסדר יורד",
+    "toAscending": "שנה לסדר עולה"
+  },
   "visible": "ניראה",
   "linkField": "שדה קישור",
   "noLayers": "אין שכבות ישויות זמינות",

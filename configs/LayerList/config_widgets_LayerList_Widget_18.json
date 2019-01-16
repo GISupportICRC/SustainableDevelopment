@@ -1,0 +1,20 @@
+{
+  "showLegend": true,
+  "expandAllLayersByDefault": false,
+  "contextMenu": {
+    "ZoomTo": true,
+    "Transparency": true,
+    "EnableOrDisablePopup": false,
+    "MoveupOrMovedown": false,
+    "OpenAttributeTable": true,
+    "DescriptionOrShowItemDetailsOrDownload": false
+  },
+  "layerOptions": {
+    "service_f3486ce309004fc2974539e0f266f5f2_9650": {
+      "display": false
+    },
+    "service_f3486ce309004fc2974539e0f266f5f2_9650_6848": {
+      "display": true
+    }
+  }
+}

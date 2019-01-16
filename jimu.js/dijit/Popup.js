@@ -49,6 +49,8 @@ define([
       //  this popup parent dom node
       container: null,
 
+      customZIndex: null, //custom z-index
+
       //buttons: Object[]
       //  this is the object format
       /*=====
@@ -77,6 +79,9 @@ define([
       _fixedHeight: false,
       // the height of Popup depends on the height of content
       autoHeight: false,
+      // the width of Popup depends on the windows.w
+      autoWidth: false,
+      isResize: true,
 
       maxHeight: 800,
       maxWidth: 1024,
@@ -112,21 +117,28 @@ define([
         // this._moveToMiddle();
         // this._limitButtonsMaxWidth();
 
-        this.own(on(window, 'resize', lang.hitch(this, function() {
-          if (this._fixedHeight || this.autoHeight) {
-            this._calculatePosition();
+        if(this.isResize){
+          this.own(on(window, 'resize', lang.hitch(this, function() {
+            if (this._fixedHeight || this.autoHeight) {
+              this._calculatePosition();
 
-            this._moveToMiddle();
-            return;
-          }
-          this._positioning();
-        })));
+              this._moveToMiddle();
+              return;
+            }
+            this._positioning();
+          })));
+        }
 
         this.overlayNode = html.create('div', {
           'class': 'jimu-overlay'
         }, this.container);
 
-        this._increaseZIndex();
+        if(this.customZIndex){
+          html.setStyle(this.domNode, 'zIndex', this.customZIndex + 1);
+          html.setStyle(this.overlayNode, 'zIndex', this.customZIndex);
+        }else{
+          this._increaseZIndex();
+        }
 
         baseFx.animateProperty({
           node: this.domNode,
@@ -299,6 +311,7 @@ define([
         var top = (flexHeight - initHeight) / 2 + headerBox.h + 20;
         top = top < headerBox.h ? headerBox.h : top;
 
+        this._calculateWidth();
         this.width = this.width || this.maxWidth;
         var left = (box.w - this.width) / 2;
 
@@ -307,6 +320,17 @@ define([
           top: top + 'px',
           width: this.width + 'px'
         });
+      },
+
+      _calculateWidth: function () {
+        if (this.autoWidth) {
+          var popupWidth = (html.getMarginBox(window.document.body).w) * 0.9;
+          if (popupWidth < 1024) {
+            popupWidth = 1024;
+          }
+
+          this.width = popupWidth;
+        }
       },
 
       _calculateHeight: function() {
@@ -380,6 +404,16 @@ define([
 
       onMoveStop: function(mover) {
         html.setStyle(mover.node, 'opacity', 1);
+      },
+
+      show: function(){
+        html.setStyle(this.overlayNode, 'display', 'block');
+        html.setStyle(this.domNode, 'display', 'block');
+      },
+
+      hide: function(){
+        html.setStyle(this.overlayNode, 'display', 'none');
+        html.setStyle(this.domNode, 'display', 'none');
       },
 
       close: function() {

@@ -34,5 +34,7 @@ define({
   "print": "Εκτύπωση",
   "clearList": "Απαλοιφή εκτυπώσεων",
   "creatingPrint": "Δημιουργία εκτύπωσης",
-  "printError": "Σφάλμα, δοκιμάστε ξανά"
+  "printError": "Σφάλμα, δοκιμάστε ξανά",
+  "forceFeatureAttributes": "Γνωρίσματα στοιχείων",
+  "includeFeatureAttributes": "Συμπερίληψη γνωρισμάτων"
 });

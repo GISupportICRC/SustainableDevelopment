@@ -5,6 +5,12 @@ define({
   "actions": "Skonfiguruj pola warstwy",
   "field": "Pole",
   "alias": "Alias",
+  "url": "Adres URL",
+  "sortField": "Pole sortowania",
+  "sortOrderTooltips": {
+    "toDescending": "Zmień na porządek malejący",
+    "toAscending": "Zmień na porządek rosnący"
+  },
   "visible": "Widoczne",
   "linkField": "Pole łącza",
   "noLayers": "Brak warstw obiektu",

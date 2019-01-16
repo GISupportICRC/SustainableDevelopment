@@ -711,6 +711,7 @@ LabelClass, PopupTemplate, Legend, Graphic, Point, Query, QueryTask) {
       array.forEach(layerObject.relationships, function(relationship) {
         if (!relationshipRole ||
         !relationship.role ||
+        relationship.cardinality === "esriRelCardinalityManyToMany" ||
         relationshipRole === relationship.role) {
           var subUrl = serverUrl + '/' + relationship.relatedTableId.toString();
           relatedUrls.push(subUrl);

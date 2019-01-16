@@ -34,5 +34,7 @@ define({
   "print": "Udskriv",
   "clearList": "Ryd udskrifter",
   "creatingPrint": "Opretter udskrift",
-  "printError": "Fejl. Prøv igen"
+  "printError": "Fejl. Prøv igen",
+  "forceFeatureAttributes": "Objekters attributter",
+  "includeFeatureAttributes": "Medtag attributter"
 });

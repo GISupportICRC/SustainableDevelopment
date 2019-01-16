@@ -1,0 +1,249 @@
+{
+  "layerInfos": [
+    {
+      "name": "Project themes",
+      "id": "service_f3486ce309004fc2974539e0f266f5f2_9650",
+      "layer": {
+        "url": "https://services1.arcgis.com/HCIJ2DmtdLnNlsE1/arcgis/rest/services/service_3e904cb130874646b41dd78dce48d994/FeatureServer/0",
+        "fields": [
+          {
+            "show": false,
+            "name": "objectid",
+            "alias": "ObjectID"
+          },
+          {
+            "show": false,
+            "name": "globalid",
+            "alias": "GlobalID"
+          },
+          {
+            "show": true,
+            "name": "country",
+            "alias": "Country"
+          },
+          {
+            "show": true,
+            "name": "region",
+            "alias": "Region"
+          },
+          {
+            "show": true,
+            "name": "title",
+            "alias": "Project title"
+          },
+          {
+            "show": true,
+            "name": "start_date",
+            "alias": "Project timeline START"
+          },
+          {
+            "show": true,
+            "name": "end_date",
+            "alias": "Project timeline END"
+          },
+          {
+            "show": true,
+            "name": "theme",
+            "alias": "Theme"
+          },
+          {
+            "show": true,
+            "name": "organisation",
+            "alias": "Organisation(s)"
+          },
+          {
+            "show": true,
+            "name": "description",
+            "alias": "Project description"
+          },
+          {
+            "show": true,
+            "name": "name",
+            "alias": "name"
+          },
+          {
+            "show": true,
+            "name": "email",
+            "alias": "Contact email (optional)"
+          },
+          {
+            "show": true,
+            "name": "project_link",
+            "alias": "Link to the project"
+          },
+          {
+            "show": true,
+            "name": "checks",
+            "alias": "Consent"
+          },
+          {
+            "show": false,
+            "name": "popUpImage",
+            "alias": "."
+          },
+          {
+            "show": false,
+            "name": "CreationDate",
+            "alias": "CreationDate"
+          },
+          {
+            "show": false,
+            "name": "Creator",
+            "alias": "Creator"
+          },
+          {
+            "show": false,
+            "name": "EditDate",
+            "alias": "EditDate"
+          },
+          {
+            "show": false,
+            "name": "Editor",
+            "alias": "Editor"
+          },
+          {
+            "show": true,
+            "name": "dataStatus",
+            "alias": "dataStatus"
+          }
+        ]
+      },
+      "show": true,
+      "showAttachments": false,
+      "sortField": "objectid",
+      "isDescending": false
+    },
+    {
+      "name": "Submitted for review",
+      "id": "service_f3486ce309004fc2974539e0f266f5f2_9650_6848",
+      "layer": {
+        "url": "https://services1.arcgis.com/HCIJ2DmtdLnNlsE1/arcgis/rest/services/service_3e904cb130874646b41dd78dce48d994/FeatureServer/0",
+        "fields": [
+          {
+            "name": "objectid",
+            "alias": "ObjectID",
+            "show": false
+          },
+          {
+            "name": "globalid",
+            "alias": "GlobalID",
+            "show": false
+          },
+          {
+            "name": "country",
+            "alias": "Country",
+            "show": true
+          },
+          {
+            "name": "region",
+            "alias": "Region",
+            "show": true
+          },
+          {
+            "name": "title",
+            "alias": "Project title",
+            "show": true
+          },
+          {
+            "name": "start_date",
+            "alias": "Project timeline START",
+            "show": true,
+            "format": {
+              "dateFormat": "shortDateShortTime"
+            }
+          },
+          {
+            "name": "end_date",
+            "alias": "Project timeline END",
+            "show": true,
+            "format": {
+              "dateFormat": "shortDateShortTime"
+            }
+          },
+          {
+            "name": "theme",
+            "alias": "Theme",
+            "show": true
+          },
+          {
+            "name": "organisation",
+            "alias": "Organisation(s)",
+            "show": true
+          },
+          {
+            "name": "description",
+            "alias": "Project description",
+            "show": true
+          },
+          {
+            "name": "name",
+            "alias": "name",
+            "show": true
+          },
+          {
+            "name": "email",
+            "alias": "Contact email (optional)",
+            "show": true
+          },
+          {
+            "name": "project_link",
+            "alias": "Link to the project",
+            "show": true
+          },
+          {
+            "name": "checks",
+            "alias": "Consent",
+            "show": true
+          },
+          {
+            "name": "popUpImage",
+            "alias": ".",
+            "show": true
+          },
+          {
+            "name": "CreationDate",
+            "alias": "CreationDate",
+            "show": false,
+            "format": {
+              "dateFormat": "shortDateShortTime"
+            }
+          },
+          {
+            "name": "Creator",
+            "alias": "Creator",
+            "show": false
+          },
+          {
+            "name": "EditDate",
+            "alias": "EditDate",
+            "show": false,
+            "format": {
+              "dateFormat": "shortDateShortTime"
+            }
+          },
+          {
+            "name": "Editor",
+            "alias": "Editor",
+            "show": false
+          }
+        ]
+      },
+      "show": false,
+      "showAttachments": false,
+      "sortField": "objectid",
+      "isDescending": false
+    }
+  ],
+  "table": {
+    "pageSizeOptions": [
+      25,
+      50,
+      100,
+      1000
+    ]
+  },
+  "hideExportButton": true,
+  "initiallyExpand": false,
+  "filterByMapExtent": true,
+  "allowTextSelection": true
+}

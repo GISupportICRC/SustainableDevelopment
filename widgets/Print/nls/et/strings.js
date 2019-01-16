@@ -34,5 +34,7 @@ define({
   "print": "Prindi",
   "clearList": "Tühista printimine",
   "creatingPrint": "Printimise tühistamine",
-  "printError": "Viga, proovige uuesti"
+  "printError": "Viga, proovige uuesti",
+  "forceFeatureAttributes": "Objekti atribuudid",
+  "includeFeatureAttributes": "Kaasa atribuudid"
 });

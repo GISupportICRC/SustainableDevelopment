@@ -5,6 +5,12 @@ define({
   "actions": "Konfigurer lagfelt",
   "field": "Felt",
   "alias": "Alias",
+  "url": "URL",
+  "sortField": "Sorter felt",
+  "sortOrderTooltips": {
+    "toDescending": "Endre til synkende rekkefølge",
+    "toAscending": "Endre til stigende rekkefølge"
+  },
   "visible": "Synlig",
   "linkField": "Lenkefelt",
   "noLayers": "Ingen tilgjengelige geoobjektlag",

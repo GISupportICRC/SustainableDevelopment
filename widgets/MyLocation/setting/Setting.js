@@ -68,7 +68,7 @@ define([
 
       getConfig: function() {
         //check inputs
-        if (!this.timeout.value || !this.scale.value) {
+        if (!this.isValid()) {
           new Message({
             message: this.nls.warning
           });
@@ -82,7 +82,14 @@ define([
 
         this.config.locateButton.scale = parseFloat(this.scale.value);
         return this.config;
-      }
+      },
 
+      isValid: function () {
+        if (!this.scale.isValid() || !this.timeout.isValid()) {
+          return false;
+        }
+
+        return true;
+      }
     });
   });

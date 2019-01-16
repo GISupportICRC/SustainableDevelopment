@@ -5,6 +5,12 @@ define({
   "actions": "Katman alanlarını yapılandır",
   "field": "Alan",
   "alias": "Takma Ad",
+  "url": "URL",
+  "sortField": "Alanları ayır",
+  "sortOrderTooltips": {
+    "toDescending": "Azalan düzene çevir",
+    "toAscending": "Artan düzene çevir"
+  },
   "visible": "Görünür",
   "linkField": "Alan bağlantısı yap",
   "noLayers": "Detay katmanı mevcut değil",

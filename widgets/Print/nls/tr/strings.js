@@ -34,5 +34,7 @@ define({
   "print": "Yazdır",
   "clearList": "Baskıları temizle",
   "creatingPrint": "Baskı oluşturuluyor",
-  "printError": "Hata, yeniden deneyin"
+  "printError": "Hata, yeniden deneyin",
+  "forceFeatureAttributes": "Öznitelikleri belirt",
+  "includeFeatureAttributes": "Öznitelikleri dahil et"
 });

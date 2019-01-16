@@ -322,7 +322,8 @@ function(declare, lang, array, html, Deferred, topic, Evented, on, aspect,
       aspect.after(widget, 'startup', lang.hitch(this, this._postWidgetStartup, widget));
       aspect.before(widget, 'destroy', lang.hitch(this, this._onDestroyWidget, widget));
 
-      on(widget.domNode, 'click', lang.hitch(this, this._onClickWidget, widget));
+      // on(widget.domNode, 'click', lang.hitch(this, this._onClickWidget, widget));
+      widget.domNode.addEventListener('click', lang.hitch(this, this._onClickWidget, widget), {capture: true});
 
       this.loaded.push(widget);
       return widget;

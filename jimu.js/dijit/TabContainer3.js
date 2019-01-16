@@ -173,6 +173,7 @@ function(declare, lang, array, html, on, Evented, query,
       var strTabItemTd = '<td nowrap class="tab-item-td"><div class="tab-item-div"></div></td>';
       var tabItemTd = html.toDom(strTabItemTd);
       tabItemTd.label = tabConfig.title || '';
+      tabItemTd.title = tabConfig.title;
       html.place(tabItemTd, this.tabTr);
       var tabItemDiv = query('.tab-item-div', tabItemTd)[0];
       tabItemDiv.innerHTML = tabItemTd.label;

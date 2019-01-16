@@ -34,5 +34,7 @@ define({
   "print": "打印",
   "clearList": "清除打印",
   "creatingPrint": "正在创建打印",
-  "printError": "出现错误，请重试"
+  "printError": "出现错误，请重试",
+  "forceFeatureAttributes": "要素属性",
+  "includeFeatureAttributes": "包括属性"
 });

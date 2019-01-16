@@ -92,7 +92,8 @@ function (declare, lang, array, html, baseFx, Deferred, all, on, topic, when,
           utils.setVerticalCenter(panel.domNode);
           this.openPanel(panel);
 
-          on(panel.domNode, 'click', lang.hitch(this, this._onPanelClick, panel));
+          // on(panel.domNode, 'click', lang.hitch(this, this._onPanelClick, panel));
+          panel.domNode.addEventListener('click', lang.hitch(this, this._onPanelClick, panel), {capture: true});
 
           def.resolve(panel);
         }));

@@ -23,13 +23,21 @@ define([
   './TwoNumbersValueProvider',
   './TwoDatesValueProvider',
   './ListValueProvider',
+  // './ListMutipleValueProvider',
+  './ListMultipleSelectProvider',
+  './IndexButtonProvider',
   './NumberListValueProvider',
   './DateIsInValueProvider',
   'jimu/utils',
   'jimu/LayerInfos/LayerInfos'
 ],
   function(lang, array, declare, BlankValueProvider, SimpleValueProvider, TwoNumbersValueProvider,
-    TwoDatesValueProvider, ListValueProvider, NumberListValueProvider, DateIsInValueProvider, jimuUtils, LayerInfos) {
+    TwoDatesValueProvider,
+    ListValueProvider,
+    // ListMultipleValueProvider,
+    ListMultipleSelectProvider,
+    IndexButtonProvider,
+    NumberListValueProvider, DateIsInValueProvider, jimuUtils, LayerInfos) {
 
     var BLANK_VALUE_PROVIDER = "BLANK_VALUE_PROVIDER";
     var SIMPLE_VALUE_PROVIDER = "SIMPLE_VALUE_PROVIDER";
@@ -38,6 +46,11 @@ define([
     var LIST_VALUE_PROVIDER = "LIST_VALUE_PROVIDER";
     var NUMBER_LIST_VALUE_PROVIDER = "NUMBER_LIST_VALUE_PROVIDER";
     var DATE_IS_IN_VALUE_PROVIDER = "DATE_IS_IN_VALUE_PROVIDER";
+
+    var ListMultiple_VALUE_PROVIDER = "ListMultiple_VALUE_PROVIDER";
+
+    var UNIQUE_PREDEFINED_VALUE_PROVIDER = "UNIQUE_PREDEFINED_VALUE_PROVIDER";
+    var MULTIPLE_PREDEFINED_VALUE_PROVIDER = "MULTIPLE_PREDEFINED_VALUE_PROVIDER";
 
     //operator + type => value provider
     var relationship = {
@@ -56,6 +69,11 @@ define([
           normalProviderType: LIST_VALUE_PROVIDER,
           supportAskForValue: true,
           filterCodedValueIfPossible: true
+        },
+        uniquePredefined:{
+          normalProviderType: UNIQUE_PREDEFINED_VALUE_PROVIDER,
+          supportAskForValue: true,
+          supportCaseSensitive: true
         }
       },
       stringOperatorIsNot: {
@@ -72,11 +90,29 @@ define([
           normalProviderType: LIST_VALUE_PROVIDER,
           supportAskForValue: true,
           filterCodedValueIfPossible: true
+        },
+        uniquePredefined:{
+          normalProviderType: UNIQUE_PREDEFINED_VALUE_PROVIDER,
+          supportAskForValue: true,
+          supportCaseSensitive: true
         }
       },
       stringOperatorStartsWith: {
         value: {
           normalProviderType: SIMPLE_VALUE_PROVIDER,
+          supportAskForValue: true,
+          supportCaseSensitive: true
+        },
+        values:{
+          normalProviderType: SIMPLE_VALUE_PROVIDER
+        },
+        uniquePredefined:{
+          normalProviderType: UNIQUE_PREDEFINED_VALUE_PROVIDER,
+          supportAskForValue: true,
+          supportCaseSensitive: true
+        },
+        multiplePredefined:{
+          normalProviderType: MULTIPLE_PREDEFINED_VALUE_PROVIDER,
           supportAskForValue: true,
           supportCaseSensitive: true
         }
@@ -86,11 +122,37 @@ define([
           normalProviderType: SIMPLE_VALUE_PROVIDER,
           supportAskForValue: true,
           supportCaseSensitive: true
+        },
+        values:{
+          normalProviderType: SIMPLE_VALUE_PROVIDER
+        },
+        uniquePredefined:{
+          normalProviderType: UNIQUE_PREDEFINED_VALUE_PROVIDER,
+          supportAskForValue: true,
+          supportCaseSensitive: true
+        },
+        multiplePredefined:{
+          normalProviderType: MULTIPLE_PREDEFINED_VALUE_PROVIDER,
+          supportAskForValue: true,
+          supportCaseSensitive: true
         }
       },
       stringOperatorContains: {
         value: {
           normalProviderType: SIMPLE_VALUE_PROVIDER,
+          supportAskForValue: true,
+          supportCaseSensitive: true
+        },
+        values:{
+          normalProviderType: SIMPLE_VALUE_PROVIDER
+        },
+        uniquePredefined:{
+          normalProviderType: UNIQUE_PREDEFINED_VALUE_PROVIDER,
+          supportAskForValue: true,
+          supportCaseSensitive: true
+        },
+        multiplePredefined:{
+          normalProviderType: MULTIPLE_PREDEFINED_VALUE_PROVIDER,
           supportAskForValue: true,
           supportCaseSensitive: true
         }
@@ -100,6 +162,47 @@ define([
           normalProviderType: SIMPLE_VALUE_PROVIDER,
           supportAskForValue: true,
           supportCaseSensitive: true
+        },
+        values:{
+          normalProviderType: SIMPLE_VALUE_PROVIDER
+        },
+        uniquePredefined:{
+          normalProviderType: UNIQUE_PREDEFINED_VALUE_PROVIDER,
+          supportAskForValue: true,
+          supportCaseSensitive: true
+        },
+        multiplePredefined:{
+          normalProviderType: MULTIPLE_PREDEFINED_VALUE_PROVIDER,
+          supportAskForValue: true,
+          supportCaseSensitive: true
+        }
+      },
+      stringOperatorIsAnyOf: {
+        values:{
+          normalProviderType: SIMPLE_VALUE_PROVIDER
+        },
+        multiple:{
+          normalProviderType: ListMultiple_VALUE_PROVIDER,
+          supportAskForValue: true,
+          filterCodedValueIfPossible: true
+        },
+        multiplePredefined:{
+          normalProviderType: MULTIPLE_PREDEFINED_VALUE_PROVIDER,
+          supportAskForValue: true
+        }
+      },
+      stringOperatorIsNoneOf: {
+        values:{
+          normalProviderType: SIMPLE_VALUE_PROVIDER
+        },
+        multiple:{
+          normalProviderType: ListMultiple_VALUE_PROVIDER,
+          supportAskForValue: true,
+          filterCodedValueIfPossible: true
+        },
+        multiplePredefined:{
+          normalProviderType: MULTIPLE_PREDEFINED_VALUE_PROVIDER,
+          supportAskForValue: true
         }
       },
       stringOperatorIsBlank: {
@@ -127,6 +230,10 @@ define([
           normalProviderType: LIST_VALUE_PROVIDER,
           supportAskForValue: true,
           filterCodedValueIfPossible: true
+        },
+        uniquePredefined:{
+          normalProviderType: UNIQUE_PREDEFINED_VALUE_PROVIDER,
+          supportAskForValue: true
         }
       },
       numberOperatorIsNot: {
@@ -142,6 +249,10 @@ define([
           normalProviderType: LIST_VALUE_PROVIDER,
           supportAskForValue: true,
           filterCodedValueIfPossible: true
+        },
+        uniquePredefined:{
+          normalProviderType: UNIQUE_PREDEFINED_VALUE_PROVIDER,
+          supportAskForValue: true
         }
       },
       numberOperatorIsAtLeast: {
@@ -156,6 +267,10 @@ define([
           normalProviderType: LIST_VALUE_PROVIDER,
           supportAskForValue: true,
           filterCodedValueIfPossible: true
+        },
+        uniquePredefined:{
+          normalProviderType: UNIQUE_PREDEFINED_VALUE_PROVIDER,
+          supportAskForValue: true
         }
       },
       numberOperatorIsLessThan: {
@@ -170,6 +285,10 @@ define([
           normalProviderType: LIST_VALUE_PROVIDER,
           supportAskForValue: true,
           filterCodedValueIfPossible: true
+        },
+        uniquePredefined:{
+          normalProviderType: UNIQUE_PREDEFINED_VALUE_PROVIDER,
+          supportAskForValue: true
         }
       },
       numberOperatorIsAtMost: {
@@ -184,6 +303,10 @@ define([
           normalProviderType: LIST_VALUE_PROVIDER,
           supportAskForValue: true,
           filterCodedValueIfPossible: true
+        },
+        uniquePredefined:{
+          normalProviderType: UNIQUE_PREDEFINED_VALUE_PROVIDER,
+          supportAskForValue: true
         }
       },
       numberOperatorIsGreaterThan: {
@@ -198,6 +321,36 @@ define([
           normalProviderType: LIST_VALUE_PROVIDER,
           supportAskForValue: true,
           filterCodedValueIfPossible: true
+        },
+        uniquePredefined:{
+          normalProviderType: UNIQUE_PREDEFINED_VALUE_PROVIDER,
+          supportAskForValue: true
+        }
+      },
+      numberOperatorIsAnyOf: {
+        values:{
+          normalProviderType: SIMPLE_VALUE_PROVIDER
+        },
+        multiple:{
+          normalProviderType: ListMultiple_VALUE_PROVIDER,
+          supportAskForValue: true
+        },
+        multiplePredefined:{
+          normalProviderType: MULTIPLE_PREDEFINED_VALUE_PROVIDER,
+          supportAskForValue: true
+        }
+      },
+      numberOperatorIsNoneOf: {
+        values:{
+          normalProviderType: SIMPLE_VALUE_PROVIDER
+        },
+        multiple:{
+          normalProviderType: ListMultiple_VALUE_PROVIDER,
+          supportAskForValue: true
+        },
+        multiplePredefined:{
+          normalProviderType: MULTIPLE_PREDEFINED_VALUE_PROVIDER,
+          supportAskForValue: true
         }
       },
       numberOperatorIsBetween: {
@@ -368,6 +521,7 @@ define([
 
         var operatorInfo = relationship[operator];
         if(operatorInfo){
+          // var version = parseFloat(this.layerDefinition.currentVersion);
           if(operatorInfo.value){
             valueTypes.push("value");
           }
@@ -380,10 +534,39 @@ define([
           if(operatorInfo.unique){
             if(this.url){
               if(!this._isStreamServer(this.url)){
-                var version = parseFloat(this.layerDefinition.currentVersion);
-                if(version >= 10.1){
-                  valueTypes.push("unique");
-                }
+                // if(version >= 10.1){
+                valueTypes.push("unique");
+                // }
+              }
+            }
+          }
+          if(operatorInfo.multiple){
+            if(this.url){
+              if(!this._isStreamServer(this.url)){
+                // if(version >= 10.1){  //version, for query params
+                valueTypes.push("multiple");
+                // }
+              }
+            }
+          }
+          // if(operatorInfo.values){   //hide values in UI
+          //   valueTypes.push("values");
+          // }
+          if(operatorInfo.uniquePredefined){
+            if(this.url){
+              if(!this._isStreamServer(this.url)){
+                // if(version >= 10.1){
+                valueTypes.push("uniquePredefined");
+                // }
+              }
+            }
+          }
+          if(operatorInfo.multiplePredefined){
+            if(this.url){
+              if(!this._isStreamServer(this.url)){
+                // if(version >= 10.1){
+                valueTypes.push("multiplePredefined");
+                // }
               }
             }
           }
@@ -498,11 +681,37 @@ define([
             //   args.showNullValues = false;
             // }
             args.showNullValues = false;
-            valueProvider = new ListValueProvider(args);
+            if(valueType === 'value' || valueType === 'field'){
+              valueProvider = new ListValueProvider(args);//origin unique provider
+            }else{
+              args.providerType = valueProviderType;
+              args.selectUI = 'dropdown';
+              // if(valueType === 'field'){
+              //   args.isNumberField = false; //field's name is a string
+              // }
+              valueProvider = new ListMultipleSelectProvider(args);
+            }
+
           }else if(valueProviderType === NUMBER_LIST_VALUE_PROVIDER){
             valueProvider = new NumberListValueProvider(args);
           }else if(valueProviderType === DATE_IS_IN_VALUE_PROVIDER){
             valueProvider = new DateIsInValueProvider(args);
+          }
+          else if(valueProviderType === ListMultiple_VALUE_PROVIDER){ //mutiple---setting&runtime
+            // valueProvider = new ListMultipleValueProvider(args);
+            args.providerType = valueProviderType;
+            args.selectUI = 'dropdown';
+            valueProvider = new ListMultipleSelectProvider(args);
+          }
+          else if(valueProviderType === UNIQUE_PREDEFINED_VALUE_PROVIDER ||
+            valueProviderType === MULTIPLE_PREDEFINED_VALUE_PROVIDER){
+            args.providerType = valueProviderType;
+            args.selectUI = args.partObj.valueObj ? args.partObj.valueObj.selectUI : null;
+            if(runtime){
+              valueProvider = new ListMultipleSelectProvider(args);
+            }else{
+              valueProvider = new IndexButtonProvider(args);
+            }
           }
         }
 
@@ -536,6 +745,8 @@ define([
           "stringOperatorEndsWith",
           "stringOperatorContains",
           "stringOperatorDoesNotContain",
+          "stringOperatorIsAnyOf",
+          "stringOperatorIsNoneOf",
           "stringOperatorIsBlank",
           "stringOperatorIsNotBlank"
         ];
@@ -544,9 +755,11 @@ define([
           "numberOperatorIs",
           "numberOperatorIsNot",
           "numberOperatorIsAtLeast",
-          "numberOperatorIsLessThan",
           "numberOperatorIsAtMost",
+          "numberOperatorIsLessThan",
           "numberOperatorIsGreaterThan",
+          "numberOperatorIsAnyOf",
+          "numberOperatorIsNoneOf",
           "numberOperatorIsBetween",
           "numberOperatorIsNotBetween",
           "numberOperatorIsBlank",

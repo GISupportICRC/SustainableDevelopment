@@ -5,6 +5,12 @@ define({
   "actions": "लेयर फ़ील्ड कॉन्फ़िगर करें",
   "field": "फ़ील्ड",
   "alias": "उपनाम",
+  "url": "URL",
+  "sortField": "फ़ील्ड क्रमित करें",
+  "sortOrderTooltips": {
+    "toDescending": "अवरोही क्रम में बदलें",
+    "toAscending": "आरोही क्रम में बदलें"
+  },
   "visible": "दृश्य",
   "linkField": "फ़ील्ड को लिंक करें",
   "noLayers": "कोई फीचर लेयरस उपलब्ध नहीं हैं",

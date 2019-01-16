@@ -94,6 +94,8 @@ function(declare, lang, array, locale, dojoNumber, esriLang, ItemFileWriteStore,
       stringOperatorEndsWith:'stringOperatorEndsWith',
       stringOperatorContains:'stringOperatorContains',
       stringOperatorDoesNotContain:'stringOperatorDoesNotContain',
+      stringOperatorIsAnyOf: "stringOperatorIsAnyOf",
+      stringOperatorIsNoneOf: "stringOperatorIsNoneOf",
       stringOperatorIsBlank:'stringOperatorIsBlank',
       stringOperatorIsNotBlank:'stringOperatorIsNotBlank',
 
@@ -109,6 +111,8 @@ function(declare, lang, array, locale, dojoNumber, esriLang, ItemFileWriteStore,
       numberOperatorIsGreaterThan:'numberOperatorIsGreaterThan',
       numberOperatorIsBetween:'numberOperatorIsBetween',
       numberOperatorIsNotBetween:'numberOperatorIsNotBetween',
+      numberOperatorIsAnyOf:'numberOperatorIsAnyOf',
+      numberOperatorIsNoneOf:'numberOperatorIsNoneOf',
       numberOperatorIsBlank:'numberOperatorIsBlank',
       numberOperatorIsNotBlank:'numberOperatorIsNotBlank',
 
@@ -248,6 +252,18 @@ function(declare, lang, array, locale, dojoNumber, esriLang, ItemFileWriteStore,
 
     },
 
+    containsNonLatinCharacterBatch: function(strArr) {
+      var isContain = false;
+      for (var k = 0; k < strArr.length; k++) {
+        var str = strArr[k];
+        var string = lang.isObject(str) ? str.value : str;
+        if(!isContain){
+          isContain = this.containsNonLatinCharacter(string);
+        }
+      }
+      return isContain;
+    },
+
     /**************************************************/
     /****  stringify                               ****/
     /**************************************************/
@@ -277,18 +293,45 @@ function(declare, lang, array, locale, dojoNumber, esriLang, ItemFileWriteStore,
 
       //real code to build filter string
       var filterString = "", displaySQL = "";
+      var part, isChecked;
       if(partsObj.parts.length === 0){
         filterString = "1=1";
         displaySQL = "1=1";
       }else if(partsObj.parts.length === 1) {
-        filterString = this.builtFilterString(partsObj.parts[0]);
-        displaySQL = partsObj.parts[0].displaySQL;
+        part = partsObj.parts[0];
+        if(part.valueObj && lang.isArray(part.valueObj.value) && part.valueObj.type !== 'multiple'){
+          isChecked = this._checkIfValObjArrayAndChecked(part.valueObj.value);
+          if(isChecked){
+            filterString = this.builtFilterString(part);
+            displaySQL = part.displaySQL;
+          }else{
+            filterString = "1=1";
+            displaySQL = "1=1";
+          }
+        }else{
+          filterString = this.builtFilterString(part);
+          displaySQL = part.displaySQL;
+        }
       } else {
         var join = "";
         //dojo.forEach(allFilters, function(node){
         for (var i = 0; i < partsObj.parts.length; i++) {
-          var str = this.builtFilterString(partsObj.parts[i]);
-          var str2 = partsObj.parts[i].displaySQL;
+          part = partsObj.parts[i];
+
+          var str, str2;
+          if(part.valueObj && lang.isArray(part.valueObj.value) && part.valueObj.type !== 'multiple'){
+            isChecked = this._checkIfValObjArrayAndChecked(part.valueObj.value);
+            if(isChecked){
+              str = this.builtFilterString(part);
+              str2 = part.displaySQL;
+            }else{
+              str = "1=1";
+              str2 = "1=1";
+            }
+          }else{
+            str = this.builtFilterString(part);
+            str2 = part.displaySQL;
+          }
           if (!esriLang.isDefined(str)) {
             // we're missing input
             return null;
@@ -301,6 +344,17 @@ function(declare, lang, array, locale, dojoNumber, esriLang, ItemFileWriteStore,
       partsObj.expr = filterString;
       partsObj.displaySQL = displaySQL;
       return filterString;
+    },
+
+    _checkIfValObjArrayAndChecked: function(valObjArray){
+      var isChecked = false;
+      for(var key in valObjArray){
+        if(valObjArray[key].isChecked){
+          isChecked = true;
+          break;
+        }
+      }
+      return isChecked;
     },
 
     _handleVirtualDate: function(partsObj){
@@ -430,6 +484,23 @@ function(declare, lang, array, locale, dojoNumber, esriLang, ItemFileWriteStore,
           return jimuUtils.isValidDate(value);
         }
       }
+      else if(valueType === 'multiple'){
+        if(shortType === 'string'){
+          return jimuUtils.isNotEmptyStringArray(value);
+        }else if(shortType === 'number'){
+          return jimuUtils.isValidNumberArray(value);
+        }
+      }
+      else if(valueType === 'values'){
+
+      }
+      else if(valueType === 'uniquePredefined' || valueType === 'multiplePredefined'){
+        if(shortType === 'string'){
+          return jimuUtils.isNotEmptyStringArray(value);
+        }else if(shortType === 'number'){
+          return jimuUtils.isValidNumberArray(value);
+        }
+      }
 
       return false;
     },
@@ -453,8 +524,13 @@ function(declare, lang, array, locale, dojoNumber, esriLang, ItemFileWriteStore,
         }
       } else {
         // single expression
-        filterString = this.builtSingleFilterString(partsObj).whereClause;
-        displaySQL = partsObj.displaySQL;
+        if(partsObj && partsObj.valueObj && partsObj.valueObj.type === 'multiple' &&
+          partsObj.valueObj.value.length === 0){
+          filterString = displaySQL = '1=1';
+        }else{
+          filterString = this.builtSingleFilterString(partsObj).whereClause;
+          displaySQL = partsObj.displaySQL;
+        }
       }
       partsObj.expr = filterString;
       partsObj.displaySQL = displaySQL;
@@ -530,8 +606,8 @@ function(declare, lang, array, locale, dojoNumber, esriLang, ItemFileWriteStore,
         }
       }
 
-      var whereClause = "", displaySQL = "";
-
+      var whereClause = "", displaySQL = "", vals = "";
+      var valsArray = [];
       if (part.fieldObj.shortType === "string") {
 
         var prefix = "";
@@ -539,15 +615,62 @@ function(declare, lang, array, locale, dojoNumber, esriLang, ItemFileWriteStore,
           // just in case the user input value has non-Latin characters
           prefix = 'N';
         }else if (value && part.valueObj.type !== 'field' && this.isHosted) {
-          if (this.containsNonLatinCharacter(value)) {
+          if((lang.isArray(value) && this.containsNonLatinCharacterBatch(value)) || // batch ???
+             (!lang.isArray(value) && this.containsNonLatinCharacter(value))){
             prefix = 'N';
           }
         }
+
+        if(value && part.valueObj.type === 'multiple'){
+          if(part.operator === this.OPERATORS.stringOperatorIsAnyOf ||
+            part.operator === this.OPERATORS.stringOperatorIsNoneOf){
+            value = "'" + value.join("','") + "'"; //"'Clow Corporation' , 'Corey'";
+          }else{ //contain, start with...
+
+          }
+        }else if(value && (part.valueObj.type === 'multiplePredefined' ||
+          part.valueObj.type === 'uniquePredefined')){ //exact query
+          valsArray = [];
+          array.forEach(value, lang.hitch(this, function(valObj) {
+            if(valObj.isChecked){
+              valsArray.push(valObj.value);
+            }
+          }));
+
+          //add functions to get 'a','b','c' from [{value:'a'},{}]
+          // valsArray = valsArray.length > 0 ? valsArray : ['']; //does not exist
+          if(part.operator === this.OPERATORS.stringOperatorIs || part.operator === this.OPERATORS.stringOperatorIsNot){
+            value = valsArray[0];
+          }else if(part.operator === this.OPERATORS.stringOperatorIsAnyOf ||
+            part.operator === this.OPERATORS.stringOperatorIsNoneOf){
+            value = "'" + valsArray.join("','") + "'"; //"'Clow Corporation' , 'Corey'";
+          }else{ //contain, start with, ...
+            value = valsArray;
+          }
+        }
+        var subWhereClause = [];
         switch (part.operator) {
           case this.OPERATORS.stringOperatorIs:
             if (part.valueObj.type === 'field') {
               whereClause = part.fieldObj.name + " = " + value;
-            } else {
+            }
+            else if (part.valueObj.type === 'multiple') {
+              // vals=lang.clone(value);
+              // for(var key in vals){
+              //   vals[key]="("+part.fieldObj.name+" = '"+vals[key]+"')";
+              // }
+              // whereClause=vals.join(' or ');
+
+              vals = value.join("','");
+              if(part.caseSensitive){
+                whereClause = part.fieldObj.name + " IN (" +
+                 prefix + "'" + vals.replace(/\'/g, "'") + "')";
+              }else{
+                whereClause = "UPPER(" + part.fieldObj.name + ") IN " +
+                 "(" + prefix + "'" + vals.replace(/\'/g, "'").toUpperCase() + "')";
+              }
+            }
+            else {
               if(part.caseSensitive){
                 whereClause = part.fieldObj.name + " = " +
                  prefix + "'" + value.replace(/\'/g, "''") + "'";
@@ -560,59 +683,149 @@ function(declare, lang, array, locale, dojoNumber, esriLang, ItemFileWriteStore,
           case this.OPERATORS.stringOperatorIsNot:
             if (part.valueObj.type === 'field') {
               whereClause = part.fieldObj.name + " <> " + value;
-            } else {
+            }
+            else if (part.valueObj.type === 'multiple') {
+              vals = value.join("','");
+              if(part.caseSensitive){
+                whereClause = part.fieldObj.name + " NOT IN (" +
+                 prefix + "'" + vals.replace(/\'/g, "'") + "')";
+              }else{
+                whereClause = "UPPER(" + part.fieldObj.name + ") NOT IN " +
+                 "(" + prefix + "'" + vals.replace(/\'/g, "'").toUpperCase() + "')";
+              }
+            }
+            else {
               if(part.caseSensitive){
                 whereClause = part.fieldObj.name + " <> " + prefix +
                  "'" + value.replace(/\'/g, "''") + "'";
               }else{
-                whereClause = "UPPER(" + part.fieldObj.name + ") = " +
+                whereClause = "UPPER(" + part.fieldObj.name + ") <> " +
                  "" + prefix + "'" + value.replace(/\'/g, "''").toUpperCase() + "'";
               }
             }
             break;
           case this.OPERATORS.stringOperatorStartsWith:
-            if(part.caseSensitive){
-              whereClause = part.fieldObj.name + " LIKE " + prefix +
-               "'" + value.replace(/\'/g, "''") + "%'";
-            }
-            else{
-              //UPPER(County) LIKE UPPER(N'石景山区%')
-              whereClause = "UPPER(" + part.fieldObj.name + ") LIKE " +
-               "" + prefix + "'" + value.replace(/\'/g, "''").toUpperCase() + "%'";
+            // if(part.caseSensitive){
+            //   whereClause = part.fieldObj.name + " LIKE " + prefix +
+            //    "'" + value.replace(/\'/g, "''") + "%'";
+            // }
+            // else{
+            //   //UPPER(County) LIKE UPPER(N'石景山区%')
+            //   whereClause = "UPPER(" + part.fieldObj.name + ") LIKE " +
+            //    "" + prefix + "'" + value.replace(/\'/g, "''").toUpperCase() + "%'";
+            // }
+            subWhereClause = [];
+            if (part.valueObj.type === 'multiple' || part.valueObj.type === 'multiplePredefined' ||
+              part.valueObj.type === 'uniquePredefined') {
+              array.forEach(value, lang.hitch(this, function(val) {
+                if(part.caseSensitive){
+                  subWhereClause.push(part.fieldObj.name + " LIKE " + prefix +
+                   "'" + val.replace(/\'/g, "''") + "%'");
+                }
+                else{
+                  subWhereClause.push("UPPER(" + part.fieldObj.name + ") LIKE " +
+                   "" + prefix + "'" + val.replace(/\'/g, "''").toUpperCase() + "%'");
+                }
+              }));
+              whereClause = "((" + subWhereClause.join(') or (') + "))";
+            }else{
+              if(part.caseSensitive){
+                whereClause = part.fieldObj.name + " LIKE " + prefix +
+                "'" + value.replace(/\'/g, "''") + "%'";
+              }
+              else{
+                //UPPER(County) LIKE UPPER(N'石景山区%')
+                whereClause = "UPPER(" + part.fieldObj.name + ") LIKE " +
+                "" + prefix + "'" + value.replace(/\'/g, "''").toUpperCase() + "%'";
+              }
             }
             break;
           case this.OPERATORS.stringOperatorEndsWith:
-            if(part.caseSensitive){
-              whereClause = part.fieldObj.name + " LIKE " + prefix +
-             "'%" + value.replace(/\'/g, "''") + "'";
-            }
-            else{
-              //UPPER(County) LIKE UPPER(N'%石景山区')
-              whereClause = "UPPER(" + part.fieldObj.name + ") LIKE " +
-             "" + prefix + "'%" + value.replace(/\'/g, "''").toUpperCase() + "'";
+            subWhereClause = [];
+            if (part.valueObj.type === 'multiple' || part.valueObj.type === 'multiplePredefined' ||
+              part.valueObj.type === 'uniquePredefined') {
+              array.forEach(value, lang.hitch(this, function(val) {
+                if(part.caseSensitive){
+                  subWhereClause.push(part.fieldObj.name + " LIKE " + prefix +
+                  "'%" + val.replace(/\'/g, "''") + "'");
+                }
+                else{
+                  subWhereClause.push("UPPER(" + part.fieldObj.name + ") LIKE " +
+                  "" + prefix + "'%" + val.replace(/\'/g, "''").toUpperCase() + "'");
+                }
+              }));
+              whereClause = "((" + subWhereClause.join(') or (') + "))";
+            }else{
+              if(part.caseSensitive){
+                whereClause = part.fieldObj.name + " LIKE " + prefix +
+              "'%" + value.replace(/\'/g, "''") + "'";
+              }
+              else{
+                //UPPER(County) LIKE UPPER(N'%石景山区')
+                whereClause = "UPPER(" + part.fieldObj.name + ") LIKE " +
+              "" + prefix + "'%" + value.replace(/\'/g, "''").toUpperCase() + "'";
+              }
             }
             break;
           case this.OPERATORS.stringOperatorContains:
-            if(part.caseSensitive){
-              whereClause = part.fieldObj.name + " LIKE " + prefix +
-             "'%" + value.replace(/\'/g, "''") + "%'";
-            }
-            else{
-              //UPPER(County) LIKE UPPER(N'%石景山区%')
-              whereClause = "UPPER(" + part.fieldObj.name + ") LIKE " +
-             "" + prefix + "'%" + value.replace(/\'/g, "''").toUpperCase() + "%'";
+            subWhereClause = [];
+            if (part.valueObj.type === 'multiple' || part.valueObj.type === 'multiplePredefined' ||
+              part.valueObj.type === 'uniquePredefined') {
+              array.forEach(value, lang.hitch(this, function(val) {
+                if(part.caseSensitive){
+                  subWhereClause.push(part.fieldObj.name + " LIKE " + prefix +
+                  "'%" + val.replace(/\'/g, "''") + "%'");
+                }
+                else{
+                  subWhereClause.push("UPPER(" + part.fieldObj.name + ") LIKE " +
+                  "" + prefix + "'%" + val.replace(/\'/g, "''").toUpperCase() + "%'");
+                }
+              }));
+              whereClause = "((" + subWhereClause.join(') or (') + "))";
+            }else{
+              if(part.caseSensitive){
+                whereClause = part.fieldObj.name + " LIKE " + prefix +
+              "'%" + value.replace(/\'/g, "''") + "%'";
+              }
+              else{
+                //UPPER(County) LIKE UPPER(N'%石景山区%')
+                whereClause = "UPPER(" + part.fieldObj.name + ") LIKE " +
+              "" + prefix + "'%" + value.replace(/\'/g, "''").toUpperCase() + "%'";
+              }
             }
             break;
           case this.OPERATORS.stringOperatorDoesNotContain:
-            if(part.caseSensitive){
-              whereClause = part.fieldObj.name + " NOT LIKE " + prefix +
-             "'%" + value.replace(/\'/g, "''") + "%'";
+            subWhereClause = [];
+            if (part.valueObj.type === 'multiple' || part.valueObj.type === 'multiplePredefined' ||
+              part.valueObj.type === 'uniquePredefined') {
+              array.forEach(value, lang.hitch(this, function(val) {
+                if(part.caseSensitive){
+                  subWhereClause.push(part.fieldObj.name + " NOT LIKE " + prefix +
+                  "'%" + val.replace(/\'/g, "''") + "%'");
+                }
+                else{
+                  subWhereClause.push("UPPER(" + part.fieldObj.name + ") NOT LIKE " +
+                  "" + prefix + "'%" + val.replace(/\'/g, "''").toUpperCase() + "%'");
+                }
+              }));
+              whereClause = "((" + subWhereClause.join(') or (') + "))";
+            }else{
+              if(part.caseSensitive){
+                whereClause = part.fieldObj.name + " NOT LIKE " + prefix +
+              "'%" + value.replace(/\'/g, "''") + "%'";
+              }
+              else{
+                //UPPER(County) NOT LIKE UPPER(N'%石景山区%')
+                whereClause = "UPPER(" + part.fieldObj.name + ") NOT LIKE " +
+              "" +  prefix + "'%" + value.replace(/\'/g, "''").toUpperCase() + "%'";
+              }
             }
-            else{
-              //UPPER(County) NOT LIKE UPPER(N'%石景山区%')
-              whereClause = "UPPER(" + part.fieldObj.name + ") NOT LIKE " +
-             "" +  prefix + "'%" + value.replace(/\'/g, "''").toUpperCase() + "%'";
-            }
+            break;
+          case this.OPERATORS.stringOperatorIsAnyOf: //caseSensitive
+            whereClause = part.fieldObj.name + " IN " + prefix + "(" + value + ")";
+            break;
+          case this.OPERATORS.stringOperatorIsNoneOf:
+            whereClause = part.fieldObj.name + " NOT IN " + prefix + "(" + value + ")";
             break;
           case this.OPERATORS.stringOperatorIsBlank:
             whereClause = part.fieldObj.name + " IS NULL";
@@ -623,7 +836,18 @@ function(declare, lang, array, locale, dojoNumber, esriLang, ItemFileWriteStore,
         }
 
       } else if (part.fieldObj.shortType === "number") {
-
+        if(value &&  (part.valueObj.type === 'uniquePredefined' || part.valueObj.type === 'multiplePredefined')){
+          //add functions to get '1,2,3' from [{value:'1'},{value:'2'}]
+          valsArray = [];
+          array.forEach(value, lang.hitch(this, function(valObj) {
+            if(valObj.isChecked){
+              valsArray.push(valObj.value);
+            }
+          }));
+          value = valsArray.join(',');
+        }else if(value && part.valueObj.type === 'multiple'){
+          value = value.join(',');
+        }
         switch (part.operator) {
           case this.OPERATORS.numberOperatorIs:
             whereClause = part.fieldObj.name + " = " + value;
@@ -642,6 +866,12 @@ function(declare, lang, array, locale, dojoNumber, esriLang, ItemFileWriteStore,
             break;
           case this.OPERATORS.numberOperatorIsGreaterThan:
             whereClause = part.fieldObj.name + " > " + value;
+            break;
+          case this.OPERATORS.numberOperatorIsAnyOf:
+            whereClause = part.fieldObj.name + " IN (" + value + ")";
+            break;
+          case this.OPERATORS.numberOperatorIsNoneOf:
+            whereClause = part.fieldObj.name + " NOT IN (" + value + ")";
             break;
           case this.OPERATORS.numberOperatorIsBetween:
             whereClause = part.fieldObj.name + " BETWEEN " + value1 + " AND " + value2;

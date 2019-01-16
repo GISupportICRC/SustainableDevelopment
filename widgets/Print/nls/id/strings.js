@@ -34,5 +34,7 @@ define({
   "print": "Cetak",
   "clearList": "Bersihkan cetakan",
   "creatingPrint": "Membuat cetakan",
-  "printError": "Eror, coba lagi"
+  "printError": "Eror, coba lagi",
+  "forceFeatureAttributes": "Atribut fitur",
+  "includeFeatureAttributes": "Sertakan atribut"
 });

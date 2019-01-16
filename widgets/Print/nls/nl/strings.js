@@ -34,5 +34,7 @@ define({
   "print": "Afdrukken",
   "clearList": "Afdrukken wissen",
   "creatingPrint": "Afdruk maken",
-  "printError": "Fout, probeer het opnieuw"
+  "printError": "Fout, probeer het opnieuw",
+  "forceFeatureAttributes": "Objectattributen",
+  "includeFeatureAttributes": "Attributen opnemen"
 });

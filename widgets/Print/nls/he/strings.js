@@ -34,5 +34,7 @@ define({
   "print": "הדפס",
   "clearList": "נקה הדפסות",
   "creatingPrint": "יוצר הדפסה",
-  "printError": "שגיאה, נסה שנית"
+  "printError": "שגיאה, נסה שנית",
+  "forceFeatureAttributes": "מאפייני ישות",
+  "includeFeatureAttributes": "כלול מאפיינים"
 });

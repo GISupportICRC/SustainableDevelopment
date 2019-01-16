@@ -34,5 +34,7 @@ define({
   "print": "Drukāt",
   "clearList": "Notīrīt izdrukas",
   "creatingPrint": "Drukas izveide",
-  "printError": "Kļūda, mēģiniet vēlreiz"
+  "printError": "Kļūda, mēģiniet vēlreiz",
+  "forceFeatureAttributes": "Elementu atribūti",
+  "includeFeatureAttributes": "Iekļaut atribūtus"
 });

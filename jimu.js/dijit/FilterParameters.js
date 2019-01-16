@@ -113,8 +113,34 @@ define([
         var validateSinglePart = lang.hitch(this, function(singlePart){
           if(singlePart.spId){
             var sp = this._getSingleFilterParameterBySpId(singlePart.spId);
-            singlePart.valueObj = sp.getValueObject();
-            return sp.getStatus();
+            // singlePart.valueObj = sp.getValueObject();
+            // return sp.getStatus();
+
+            var valObj = sp.getValueObject();
+            singlePart.valueObj = valObj;
+            if(valObj && (valObj.type === 'uniquePredefined' || valObj.type === 'multiplePredefined')){ //for valueList [{},{}]
+              var newValObj = [];
+              for(var key in valObj.value){
+                if(valObj.value[key].isChecked){
+                  newValObj.push(valObj.value[key]);
+                }
+              }
+              if(newValObj.length > 0){
+                singlePart.valueObj.value = newValObj;
+                return 1;
+              }else{
+                singlePart.valueObj.value = '';
+                return -1;
+              }
+            }else if(valObj && valObj.type === 'multipleDynamic'){//for valueList [1,2]
+              return valObj.value.length > 0 ? 1: -1;
+            }else if(valObj && valObj.type === 'unique'){//for value
+              // return !valObj.value ? -1: 1; //it could be number 0.
+              return (valObj.value === null || valObj.value === undefined || valObj.value === '') ? -1 : 1;
+            }
+            else{//for common value type
+              return sp.getStatus();
+            }
           }else{
             return singlePart.valueObj ? 1 : -1;
           }
@@ -152,16 +178,23 @@ define([
         for(var i = 0; i < _partsObj.parts.length; i++){
           var p = _partsObj.parts[i];
           if (p.parts) {
-            if(tryPushParts(p) < 0 && returnNullIfInvalidPart){
+            if(tryPushParts(p) < 0 && returnNullIfInvalidPart){ //?????
               return null;
             }
           } else {
             if(tryPushSinglePart(p) < 0 && returnNullIfInvalidPart){
-              return null;
+              if(p.valueObj && p.valueObj.type !== 'uniquePredefined' && p.valueObj.type !== 'multiplePredefined' &&
+                p.valueObj.type !== 'unique'){
+                return null;
+              }
             }
           }
         }
 
+        //for predefined (needs a object structure to enable toggleFilter)
+        // if(newPartsObj.parts.length === 0){
+        // return null;
+        // }
         return newPartsObj;
       },
 

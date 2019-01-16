@@ -348,6 +348,10 @@ define([
 
       isEnabled: function(){
         return this._enabled;
+      },
+
+      destroy: function(){
+        this.inherited(arguments);
       }
 
     });

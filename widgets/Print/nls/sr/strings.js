@@ -34,5 +34,7 @@ define({
   "print": "Štampaj",
   "clearList": "Obriši štampu",
   "creatingPrint": "Kreiranje štampe",
-  "printError": "Greška, pokušajte kasnije"
+  "printError": "Greška, pokušajte kasnije",
+  "forceFeatureAttributes": "Atributi geoobjekta",
+  "includeFeatureAttributes": "Uključi atribute"
 });

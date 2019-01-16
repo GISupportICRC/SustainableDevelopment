@@ -40,5 +40,21 @@ define({
   "sortDes": "Razvrsti padajoče",
   "statistics": "Statistika",
   "attachments": "Priloge",
-  "files": "datoteke"
+  "files": "datoteke",
+  "keepRichTextLabel": "Obdrži format obogatenega besedila",
+  "whatsThis": "Kaj je to?",
+  "richTextMessage": {
+    "explanatoryText": {
+      "line1": "${layerName} vsebuje naslednja polja obogatenega besedila: ",
+      "line2": " ki lahko vsebujejo sloge za oblikovanje besedila, kot so pisave, barve ali velikosti besedila.",
+      "line3": "Ko bodo slogi za oblikovanje besedila izvoženi v CSV, bodo ohranjeni v obliki oznak HTML. Izberete lahko, da ne boste obdržali formatov obogatenega besedila, tako da odkljukate polje »Ohrani format obogatenega besedila«."
+    },
+    "example": {
+      "label": "Na primer:",
+      "scenarios": {
+        "first": "bo privzeto izvožen kot naslednje besedilo:",
+        "second": "in naslednje besedilo brez formata obogatenega besedila:"
+      }
+    }
+  }
 });

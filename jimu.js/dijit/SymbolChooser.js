@@ -98,6 +98,8 @@ function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
       'FireFly'
     ],
 
+    cropImage: false, //optional
+
     //public methods:
     //reset
     //showBySymbol
@@ -924,7 +926,8 @@ function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
 
     _initImageChooser: function(){
       this.imageChooser = new ImageChooser({
-        cropImage: false,
+        cropImage: this.cropImage,
+        customZIndex: this.customZIndex,
         showSelfImg: false,
         goldenWidth: 16,
         goldenHeight: 16,

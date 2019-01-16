@@ -44,6 +44,7 @@ define([
     return declare([BaseWidgetSetting, _WidgetsInTemplateMixin], {
       baseClass: 'jimu-widget-search-setting',
       _currentSourceSetting: null,
+      _defaultZoomScale: null,
 
       postCreate: function() {
         this.inherited(arguments);
@@ -210,7 +211,7 @@ define([
           singleLineFieldName: setting.singleLineFieldName || "",
           placeholder: setting.placeholder || "",
           countryCode: setting.countryCode || "",
-          zoomScale: setting.zoomScale || 50000,
+          zoomScale: setting.zoomScale || this._defaultZoomScale,
           maxSuggestions: setting.maxSuggestions || 6,
           maxResults: setting.maxResults || 6,
           searchInCurrentMapExtent: !!setting.searchInCurrentMapExtent,
@@ -269,7 +270,7 @@ define([
           singleLineFieldName: setting.singleLineFieldName || "",
           placeholder: setting.placeholder || "",
           countryCode: setting.countryCode || "",
-          zoomScale: setting.zoomScale || 50000,
+          zoomScale: setting.zoomScale || this._defaultZoomScale,
           maxSuggestions: setting.maxSuggestions || 6,
           maxResults: setting.maxResults || 6,
           searchInCurrentMapExtent: !!setting.searchInCurrentMapExtent,
@@ -320,7 +321,7 @@ define([
           searchFields: setting.searchFields || [],
           displayField: setting.displayField || definition.displayField || "",
           exactMatch: !!setting.exactMatch,
-          zoomScale: setting.zoomScale || 50000,
+          zoomScale: setting.zoomScale || this._defaultZoomScale,
           maxSuggestions: setting.maxSuggestions || 6,
           maxResults: setting.maxResults || 6,
           searchInCurrentMapExtent: !!setting.searchInCurrentMapExtent,
@@ -383,7 +384,7 @@ define([
           searchFields: setting.searchFields || [],
           displayField: setting.displayField || definition.displayField || "",
           exactMatch: !!setting.exactMatch,
-          zoomScale: setting.zoomScale || 50000,
+          zoomScale: setting.zoomScale || this._defaultZoomScale,
           maxSuggestions: setting.maxSuggestions || 6,
           maxResults: setting.maxResults || 6,
           searchInCurrentMapExtent: !!setting.searchInCurrentMapExtent,

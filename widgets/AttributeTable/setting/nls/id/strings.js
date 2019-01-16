@@ -5,6 +5,12 @@ define({
   "actions": "Konfigurasikan kolom layer",
   "field": "Kolom",
   "alias": "Alias",
+  "url": "URL",
+  "sortField": "Urutkan kolom",
+  "sortOrderTooltips": {
+    "toDescending": "Ubah ke urutan turun",
+    "toAscending": "Ubah ke urutan naik"
+  },
   "visible": "Terlihat",
   "linkField": "Kolom tautan",
   "noLayers": "Tidak ada layer fitur yang tersedia",

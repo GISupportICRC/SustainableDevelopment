@@ -851,7 +851,7 @@ define([
       //   will be listened events by this module
       var handleAdd, handleRemove, handleBeforeMapUnload, handleIsShowInMapChanged,
       handleVisibleChanged, handleFilterChanged, handleReorder, handleRendererChanged,
-      handleOpacityChanged;
+      handleOpacityChanged, handleTimeExtentChanged;
       handleAdd = on(this.map, "layer-add-result", lang.hitch(this, this._onLayersChange, clazz.ADDED));
       handleRemove = on(this.map, "layer-remove", lang.hitch(this, this._onLayersChange, clazz.REMOVED));
 
@@ -876,6 +876,9 @@ define([
       handleOpacityChanged = topic.subscribe('layerInfos/layerInfo/opacityChanged',
         lang.hitch(this, this._onOpacityChanged));
 
+      handleTimeExtentChanged = topic.subscribe('layerInfos/layerInfo/timeExtentChanged',
+        lang.hitch(this, this._onTimeExtentChanged));
+
       handleBeforeMapUnload = on(this.map, "before-unload", lang.hitch(this, function() {
         handleAdd.remove();
         handleRemove.remove();
@@ -886,6 +889,7 @@ define([
         handleRendererChanged.remove();
         handleBeforeMapUnload.remove();
         handleOpacityChanged.remove();
+        handleTimeExtentChanged.remove();
         this._destroyLayerInfos();
       }));
     },
@@ -918,38 +922,41 @@ define([
       var layerInfo = null, layerInfoSelf, changedType;
       if (!evt.error &&
         evt.layer.declaredClass !== "esri.layers.GraphicsLayer" &&
-        evt.layer.declaredClass !== "esri.layers.LabelLayer" &&
-        !evt.layer._basemapGalleryLayerType) {
-        if (changedTypePara === clazz.ADDED) {
-          this.update();
-          //layerInfo = this._findTopLayerInfoById(evt.layer.id);
-          layerInfoSelf = this._findLayerInfoById(evt.layer.id);
-          layerInfo = layerInfoSelf;
-          changedType = clazz.ADDED;
-          if(layerInfoSelf && !layerInfoSelf.isRootLayer()) {
-            layerInfo = layerInfoSelf.getRootLayerInfo();
-            changedType = clazz.SUBLAYER_ADDED;
+        evt.layer.declaredClass !== "esri.layers.LabelLayer") {
+
+        if(!evt.layer._basemapGalleryLayerType) {
+          if (changedTypePara === clazz.ADDED) {
+            this.update();
+            //layerInfo = this._findTopLayerInfoById(evt.layer.id);
+            layerInfoSelf = this._findLayerInfoById(evt.layer.id);
+            layerInfo = layerInfoSelf;
+            changedType = clazz.ADDED;
+            if(layerInfoSelf && !layerInfoSelf.isRootLayer()) {
+              layerInfo = layerInfoSelf.getRootLayerInfo();
+              changedType = clazz.SUBLAYER_ADDED;
+            }
+          } else {
+            //layerInfo = this._findTopLayerInfoById(evt.layer.id);
+            layerInfoSelf = this._findLayerInfoById(evt.layer.id);
+            layerInfo = layerInfoSelf;
+            changedType = clazz.REMOVED;
+            if(layerInfoSelf && !layerInfoSelf.isRootLayer()) {
+              layerInfo = layerInfoSelf.getRootLayerInfo();
+              changedType = clazz.SUBLAYER_REMOVED;
+            }
+            if(layerInfoSelf) {
+              layerInfoSelf.destroy();
+            }
+            this.update();
+          }
+          // layerInfos top layer changed.
+          if(layerInfo) {
+            this._emitEvent('layerInfosChanged', layerInfo, changedType, layerInfoSelf);
           }
         } else {
-          //layerInfo = this._findTopLayerInfoById(evt.layer.id);
-          layerInfoSelf = this._findLayerInfoById(evt.layer.id);
-          layerInfo = layerInfoSelf;
-          changedType = clazz.REMOVED;
-          if(layerInfoSelf && !layerInfoSelf.isRootLayer()) {
-            layerInfo = layerInfoSelf.getRootLayerInfo();
-            changedType = clazz.SUBLAYER_REMOVED;
-          }
-          if(layerInfoSelf) {
-            layerInfoSelf.destroy();
-          }
-          this.update();
+          // basmemap layers are changed
+          this._emitEvent('basemapLayersChanged');
         }
-        // layerInfos top layer changed.
-        if(layerInfo) {
-          this._emitEvent('layerInfosChanged', layerInfo, changedType, layerInfoSelf);
-        }
-        // layerInfos selfLayer changed.
-        // layerInfosWholeChanged
       }
     },
 
@@ -995,6 +1002,11 @@ define([
     _onOpacityChanged: function(changedLayerInfos) {
       this._emitEvent('layerInfosOpacityChanged', changedLayerInfos);
       this._emitEventForEveryLayerInfo('opacityChanged', changedLayerInfos);
+    },
+
+    _onTimeExtentChanged: function(changedLayerInfos) {
+      this._emitEvent('layerInfosTimeExtentChanged', changedLayerInfos);
+      this._emitEventForEveryLayerInfo('timeExtentChanged', changedLayerInfos);
     }
 
     // _onUpdated: function() {

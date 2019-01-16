@@ -34,5 +34,7 @@ define({
   "print": "Печать",
   "clearList": "Очистить список печати",
   "creatingPrint": "Создание документа печати",
-  "printError": "Ошибка, попробуйте еще раз"
+  "printError": "Ошибка, попробуйте еще раз",
+  "forceFeatureAttributes": "Атрибуты пространственных объектов",
+  "includeFeatureAttributes": "Включить атрибуты"
 });

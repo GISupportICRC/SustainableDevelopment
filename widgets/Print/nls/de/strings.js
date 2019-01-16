@@ -34,5 +34,7 @@ define({
   "print": "Drucken",
   "clearList": "Ausdrucke löschen",
   "creatingPrint": "Ausdruck wird erstellt",
-  "printError": "Fehler, versuchen Sie es erneut"
+  "printError": "Fehler, versuchen Sie es erneut",
+  "forceFeatureAttributes": "Feature-Attribute",
+  "includeFeatureAttributes": "Attribute einbeziehen"
 });

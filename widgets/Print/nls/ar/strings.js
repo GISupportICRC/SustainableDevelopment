@@ -34,5 +34,7 @@ define({
   "print": "طباعة",
   "clearList": "مسح الطباعة",
   "creatingPrint": "مسح الطباعة",
-  "printError": "خطأ، الرجاء إعادة المحاولة"
+  "printError": "خطأ، الرجاء إعادة المحاولة",
+  "forceFeatureAttributes": "جداول بيانات المعالم",
+  "includeFeatureAttributes": "تضمين جداول البيانات"
 });

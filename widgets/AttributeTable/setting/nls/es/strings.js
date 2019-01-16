@@ -5,6 +5,12 @@ define({
   "actions": "Configurar campos de capa",
   "field": "Campo",
   "alias": "Alias",
+  "url": "Dirección URL",
+  "sortField": "El campo de ordenación",
+  "sortOrderTooltips": {
+    "toDescending": "Cambiar a orden descendente",
+    "toAscending": "Cambiar a orden ascendente"
+  },
   "visible": "Visible",
   "linkField": "Campo de vínculo",
   "noLayers": "No hay capas de entidades disponibles",

@@ -150,6 +150,8 @@ define([
 
       moveTopOnActive: false,
 
+      _ENABLE_MAP_POPUP: false,
+
       postMixInProperties: function() {
         this.nls.enableClick = this.nls.enableClick ||
           "Click to enable clicking map to get coordinates";
@@ -476,10 +478,12 @@ define([
       },
 
       disableWebMapPopup: function() {
+        this._ENABLE_MAP_POPUP = false;
         this.map.setInfoWindowOnClick(false);
       },
 
       enableWebMapPopup: function() {
+        this._ENABLE_MAP_POPUP = true;
         this.map.setInfoWindowOnClick(true);
       },
 
@@ -514,6 +518,18 @@ define([
             this.enableWebMapPopup();
             html.setAttr(this.locateButton, 'title', this.nls.enableClick);
           }
+        }
+      },
+
+      onActive: function () {
+        if (!this.locateContainer || !html.hasClass(this.locateContainer, 'coordinate-locate-container-active')) {
+          return;
+        }
+
+        if (this._ENABLE_MAP_POPUP === true) {
+          this.enableWebMapPopup();//trigger after other widgets onDeActive
+        } else {
+          this.disableWebMapPopup();
         }
       },
 

@@ -5,6 +5,12 @@ define({
   "actions": "Configurer les champs de couche",
   "field": "Champ",
   "alias": "Alias",
+  "url": "URL",
+  "sortField": "Champ de tri",
+  "sortOrderTooltips": {
+    "toDescending": "Tri décroissant",
+    "toAscending": "Tri croissant"
+  },
   "visible": "Visible",
   "linkField": "Hyperlien",
   "noLayers": "Aucune couche d'entités disponible",

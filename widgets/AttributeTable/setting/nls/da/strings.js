@@ -5,6 +5,12 @@ define({
   "actions": "Konfigurér lagfelter",
   "field": "Felt",
   "alias": "Alias",
+  "url": "URL",
+  "sortField": "Sortér felt",
+  "sortOrderTooltips": {
+    "toDescending": "Skift til faldende rækkefølge",
+    "toAscending": "Skift til stigende rækkefølge"
+  },
   "visible": "Synlig",
   "linkField": "Link-felt",
   "noLayers": "Der er ingen tilgængelige vektorlag",

@@ -1242,6 +1242,28 @@ Evented, /*xhr,*/ scriptRequest, portalUrlUtils, portalUtils, LayerNode, jimuUti
                                        lang.hitch(this, this._onOpacityChanged));
           this._eventHandles.push(handle);
         }
+
+        // bind time extent change event when map's time extend has been changed. just for root layer.
+        if(this.isRootLayer()) {
+          handle = this.map.on('time-extent-change', lang.hitch(this, function() {
+            if(this.layerObject && this.layerObject.useMapTime) {
+              this._onTimeExtentChanged();
+            }
+          }));
+          this._eventHandles.push(handle);
+        }
+
+        // bind time extent change event. just for root layer.
+        if(this.isRootLayer()) {
+          handle = aspect.after(this.layerObject, 'setTimeDefinition', lang.hitch(this, function() {
+            if(this.layerObject &&
+               this.layerObject.timeInfo &&
+               this.layerObject.mode === esri.layers.FeatureLayer.MODE_SNAPSHOT) { //jshint ignore: line
+              this._onTimeExtentChanged();
+            }
+          }));
+          this._eventHandles.push(handle);
+        }
       }
     },
 
@@ -1277,8 +1299,25 @@ Evented, /*xhr,*/ scriptRequest, portalUrlUtils, portalUtils, LayerNode, jimuUti
     _onOpacityChanged: function() {
       var changedLayerInfos = [this];
       topic.publish('layerInfos/layerInfo/opacityChanged', changedLayerInfos);
-    }
+    },
 
+    _onTimeExtentChanged: function() {
+      var changedLayerInfos = [];
+      var subServiceDefinitionDefs = [];
+      this.traversal(function(layerInfo) {
+        var def = layerInfo.getServiceDefinition().then(function(serviceDefinition) {
+          if(serviceDefinition && serviceDefinition.timeInfo) {
+            changedLayerInfos.push(layerInfo);
+          }
+          //todo... need to sync 'time extent' to subLayerObject
+        });
+        subServiceDefinitionDefs.push(def);
+      });
+
+      all(subServiceDefinitionDefs).then(lang.hitch(this, function() {
+        topic.publish('layerInfos/layerInfo/timeExtentChanged', changedLayerInfos);
+      }));
+    }
   });
 
   clazz.ItemInfo = declare(null, {

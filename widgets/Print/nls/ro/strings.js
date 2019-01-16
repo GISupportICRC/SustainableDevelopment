@@ -34,5 +34,7 @@ define({
   "print": "Imprimare",
   "clearList": "Golire imprimări",
   "creatingPrint": "În curs de creare imprimare",
-  "printError": "Eroare, reîncercaţi"
+  "printError": "Eroare, reîncercaţi",
+  "forceFeatureAttributes": "Atribute de obiecte spațiale",
+  "includeFeatureAttributes": "Includeți atributele"
 });

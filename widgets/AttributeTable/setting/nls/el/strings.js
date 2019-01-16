@@ -5,6 +5,12 @@ define({
   "actions": "Διαμόρφωση πεδίων θεματικού επιπέδου",
   "field": "Πεδίο",
   "alias": "Ψευδώνυμο",
+  "url": "Διεύθυνση URL",
+  "sortField": "Πεδίο ταξινόμησης",
+  "sortOrderTooltips": {
+    "toDescending": "Αλλαγή σε φθίνουσα σειρά",
+    "toAscending": "Αλλαγή σε αύξουσα σειρά"
+  },
   "visible": "Ορατό",
   "linkField": "Πεδίο συνδέσμου",
   "noLayers": "Δεν υπάρχουν διαθέσιμα feature layer",

@@ -5,6 +5,12 @@ define({
   "actions": "レイヤー フィールドの構成",
   "field": "フィールド",
   "alias": "エイリアス",
+  "url": "URL",
+  "sortField": "並べ替えフィールド",
+  "sortOrderTooltips": {
+    "toDescending": "降順に変更",
+    "toAscending": "昇順に変更"
+  },
   "visible": "表示",
   "linkField": "リンク フィールド",
   "noLayers": "使用できるフィーチャ レイヤーはありません",
