@@ -586,7 +586,7 @@ function (declare, lang, array, html, dojoConfig, cookie,
           if(this.portalSelf.portalProperties.sharedTheme.logo.small){
             appConfig.logo = this.portalSelf.portalProperties.sharedTheme.logo.small;
           }else{
-            appConfig.logo = 'images/ICRC_IFRC_Logo.png';
+            appConfig.logo = 'images/app-logo.png';
           }
 
           if(!appConfig.logoLink && this.portalSelf.portalProperties.sharedTheme.logo.link){
@@ -594,7 +594,7 @@ function (declare, lang, array, html, dojoConfig, cookie,
           }
         }else{
           console.error('Portal does not support sharedTheme, use default logo.');
-          appConfig.logo = 'images/ICRC_IFRC_Logo.png';
+          appConfig.logo = 'images/app-logo.png';
         }
       }
     },

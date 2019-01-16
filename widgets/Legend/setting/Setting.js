@@ -65,6 +65,7 @@ define([
         }
         this.autoUpdate.setValue(config.legend.autoUpdate);
         this.respectCurrentMapScale.setValue(config.legend.respectCurrentMapScale);
+        this.showLegendForBasemap.setValue(config.showLegendForBasemap);
 
         this._setLayerChooser(this.config.layerState);
 
@@ -80,6 +81,7 @@ define([
         this.config.legend.arrangement = parseInt(this.selectArrangement.get('value'), 10);
         this.config.legend.autoUpdate = this.autoUpdate.checked;
         this.config.legend.respectCurrentMapScale = this.respectCurrentMapScale.checked;
+        this.config.showLegendForBasemap = this.showLegendForBasemap.checked;
 
         this.config.syncWithWebmap = this.syncWithWebmapToggle.checked;
 
@@ -122,6 +124,7 @@ define([
             customFilter: customFilter,
             layerState: layerState,
             layerStateController: LayerChooserFromMapLite.layerLegendStateController,
+            onlyShowWebMapLayers: true,
             onlySelectLeafLayer: true
           });
           this.layerChooser.placeAt(this.layerChooserDiv);

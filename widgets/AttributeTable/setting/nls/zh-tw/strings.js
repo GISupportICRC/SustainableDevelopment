@@ -5,6 +5,12 @@ define({
   "actions": "配置圖層欄位",
   "field": "欄位",
   "alias": "別名",
+  "url": "URL",
+  "sortField": "排序欄位",
+  "sortOrderTooltips": {
+    "toDescending": "變更為降冪順序",
+    "toAscending": "變更為升冪順序"
+  },
   "visible": "可見",
   "linkField": "連結欄位",
   "noLayers": "沒有可用的圖徵圖層",

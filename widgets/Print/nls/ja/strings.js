@@ -34,5 +34,7 @@ define({
   "print": "印刷",
   "clearList": "印刷結果の消去",
   "creatingPrint": "印刷中",
-  "printError": "エラーが発生しました。もう一度試してください。"
+  "printError": "エラーが発生しました。もう一度試してください。",
+  "forceFeatureAttributes": "フィーチャ属性",
+  "includeFeatureAttributes": "属性を含む"
 });

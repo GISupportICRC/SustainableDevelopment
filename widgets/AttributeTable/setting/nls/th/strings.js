@@ -5,6 +5,12 @@ define({
   "actions": "กำหนดค่าฟิลด์ของชั้นข้อมูล",
   "field": "คอลัมน์",
   "alias": "นามแฝง",
+  "url": "URL",
+  "sortField": "จัดเรียงฟิลด์",
+  "sortOrderTooltips": {
+    "toDescending": "เปลี่ยนเป็นลำดับจากมากไปน้อย",
+    "toAscending": "เปลี่ยนเป็นลำดับจากน้อยไปมาก"
+  },
   "visible": "มองเห็น",
   "linkField": "ลิงค์ฟิลด์",
   "noLayers": "ไม่ปรากฏชั้นข้อมูลฟีเจอร์",

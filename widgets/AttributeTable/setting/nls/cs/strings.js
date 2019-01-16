@@ -5,6 +5,12 @@ define({
   "actions": "Konfigurovat pole vrstvy",
   "field": "Pole",
   "alias": "Přezdívka",
+  "url": "URL",
+  "sortField": "Pole třídění",
+  "sortOrderTooltips": {
+    "toDescending": "Změnit na sestupné pořadí",
+    "toAscending": "Změnit na vzestupné pořadí"
+  },
   "visible": "Viditelná",
   "linkField": "Pole odkazů",
   "noLayers": "Nejsou k dispozici žádné vrstvy",

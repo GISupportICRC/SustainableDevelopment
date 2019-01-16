@@ -51,11 +51,15 @@
     </table>
   </div>
 
-  <div class="value-type-popup" data-dojo-attach-point="valueTypePopupNode">
+  <div class="value-type-popup value-type-popup-new" data-dojo-attach-point="valueTypePopupNode">
     <ul>
-      <li data-type="value" data-dojo-attach-event="click:_onValueTypeClick"><span>${nls.value}</span><span></span></li>
-      <li data-type="field" data-dojo-attach-event="click:_onValueTypeClick"><span>${nls.field}</span><span></span></li>
-      <li data-type="unique" data-dojo-attach-event="click:_onValueTypeClick"><span>${nls.unique}</span><span></span></li>
+      <li data-type="value" title="${nls.value}" data-dojo-attach-event="click:_onValueTypeClick"><span>${nls.value}</span><span></span></li>
+      <!-- <li data-type="values" title="${nls.values}" data-dojo-attach-event="click:_onValueTypeClick"><span>${nls.values}</span><span></span></li> -->
+      <li data-type="field" title="${nls.field}" data-dojo-attach-event="click:_onValueTypeClick"><span>${nls.field}</span><span></span></li>
+      <li data-type="unique" title="${nls.unique}" data-dojo-attach-event="click:_onValueTypeClick"><span>${nls.unique}</span><span></span></li>
+      <li data-type="uniquePredefined" title="${nls.uniquePredefined}" data-dojo-attach-event="click:_onValueTypeClick"><span>${nls.uniquePredefined}</span><span></span></li>
+      <li data-type="multiple" title="${nls.multiple}" data-dojo-attach-event="click:_onValueTypeClick"><span>${nls.multiple}</span><span></span></li>
+      <li data-type="multiplePredefined" title="${nls.multiplePredefined}" data-dojo-attach-event="click:_onValueTypeClick"><span>${nls.multiplePredefined}</span><span></span></li>
     </ul>
   </div>
 </div>

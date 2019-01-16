@@ -6,6 +6,7 @@ define({
   "respectCurrentMapScale": "Учитывать текущий масштаб карты",
   "layerSelectorTitle": "Выбрать слои для отображения в легенде: ",
   "showLegendsForLayers": "Показать легенду для слоев:",
+  "showBasemapLegends": "Показать легенду базовой карты",
   "honorTheWebMapSetting": "Учитывать настройки веб-карты",
   "reset": "Сбросить",
   "resetTip": "Восстановить исходные настройки веб-карты."

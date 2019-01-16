@@ -1089,86 +1089,10 @@ define([
         var def = new Deferred();
         var portalUrl = portalUrlUtils.getStandardPortalUrl(_portalUrl);
         var portal = this.getPortal(portalUrl);
-
-        // step 1: get `portalSelf`
-        this.getPortalSelfInfo(_portalUrl).then(lang.hitch(this, function(portalSelf){
-          // step 2: search org webscene when getting `portalSelf` failed
-          if(!portalSelf || !portalSelf.livingAtlasGroupQuery){
-            this._searchWABCreatedWebScene(_portalUrl, def);
-            return;
-          }
-
-          var livingAtlasGroupQuery = portalSelf.livingAtlasGroupQuery;
-
-          // step 2: query `livingAtlasGroupQuery` to get `livingAtlasGroupId`
-          portal.queryGroups({"q": livingAtlasGroupQuery})
-          .then(lang.hitch(this, function(response){
-
-            // step 3: pass '' to next `then` method when there is no response
-            if(!response || !response.results || !response.results.length ||  response.results.length <= 0){
-              return '';
-            }
-
-            // step 3: pass `livingAtlasGroupId` to next `then` method when there is response
-            var results = response.results;
-            var livingAtlasGroup = [];
-            livingAtlasGroup = results.filter(function(res){
-              return res.title && res.title === 'Living Atlas';
-            });
-
-            return livingAtlasGroup[0] && livingAtlasGroup[0].id;
-          }))
-          .then(lang.hitch(this, function(livingAtlasGroupId){
-
-            // step 4: search org webscene when there is no livingAtlasGroupId
-            if(!livingAtlasGroupId || livingAtlasGroupId === ''){
-              this._searchWABCreatedWebScene(_portalUrl, def);
-              return;
-            }
-
-            // step 4: query items to get webscenes using `livingAtlasGroupId`
-            portal.queryItems({
-              "q": "(group:\"" + livingAtlasGroupId +
-                  "\" AND type:\"Web Scene\" AND tags:\"scenes\" AND -tags:\"mature support\")",
-              "sortField": "numViews",
-              "sortOrder": "desc"
-            })
-            .then(lang.hitch(this, function(res){
-              // step 5: search org webscene when there is no response
-              if(!res || !res.results || !res.results.length || res.results.length <= 0){
-                this._searchWABCreatedWebScene(_portalUrl, def);
-                return;
-              }
-              // step 5: search org webscene when there is response
-              def.resolve(res.results[0].id);
-            }), lang.hitch(this, function(){
-              // step 5: search org webscene when getting webscenes (step 4) failed
-              this._searchWABCreatedWebScene(_portalUrl, def);
-            }));
-
-          }), lang.hitch(this, function(){
-
-            // step 4: search org webscene when passing `livingAtlasGroupId` (step 3) failed
-            this._searchWABCreatedWebScene(_portalUrl, def);
-
-          }));
-
-        }), lang.hitch(this, function(){
-
-          // step 2: search org webscene when getting `portalSelf` (step 1) failed
-          this._searchWABCreatedWebScene(_portalUrl, def);
-
-        }));
-
-        return def;
-      },
-
-      _searchWABCreatedWebScene: function(_portalUrl, def){
-        var portalUrl = portalUrlUtils.getStandardPortalUrl(_portalUrl);
-        var portal = this.getPortal(portalUrl);
         //must use double quotation marks around typeKeywords
         //such as typekeywords:"Web AppBuilder" or typekeywords:"Web AppBuilder,Web Map"
-        var q = 'typekeywords:"WABDefaultWebScene" orgid:' + portal.user.orgId + ' access:public ' + this.webSceneQueryStr;
+        var q = 'typekeywords:"WABDefaultWebScene" orgid:' + portal.user.orgId +
+        ' access:public ' + this.webSceneQueryStr;
         var args = {
           q: q
         };
@@ -1182,6 +1106,7 @@ define([
           console.error("_searchWABDefaultWebScene error:", err);
           def.reject(err);
         }));
+        return def;
       },
 
       //resolve newly created web scene id
@@ -1226,9 +1151,9 @@ define([
               "latestWkid": 3857,
               "wkid": 102100
             },
-            "version": "1.10",
+            "version": "1.11",
             "authoringApp": "WebAppBuilder",
-            "authoringAppVersion": "2.8"
+            "authoringAppVersion": "2.9"
           };
           var text = dojoJson.stringify(data);
           var args = {

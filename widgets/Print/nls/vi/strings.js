@@ -34,5 +34,7 @@ define({
   "print": "In",
   "clearList": "Xóa bản in",
   "creatingPrint": "Đang tạo bản in",
-  "printError": "Lỗi, thử lại"
+  "printError": "Lỗi, thử lại",
+  "forceFeatureAttributes": "Thuộc tính đối tượng",
+  "includeFeatureAttributes": "Bao gồm thuộc tính"
 });

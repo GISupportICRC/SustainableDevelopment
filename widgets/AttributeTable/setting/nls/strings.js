@@ -6,6 +6,12 @@ define({
     actions: "Configure layer fields",
     field: "Field",
     alias: "Alias",
+    url: "URL",
+    sortField: "Sort field",
+    sortOrderTooltips: {
+      toDescending: "Change to descending order",
+      toAscending: "Change to ascending order"
+    },
     visible: "Visible",
     linkField: "Link field",
     noLayers: "No feature layers are available",
@@ -34,6 +40,7 @@ define({
   }),
   "ar": 1,
   "bs": 1,
+  "ca": 1,
   "cs": 1,
   "da": 1,
   "de": 1,
@@ -45,6 +52,7 @@ define({
   "he": 1,
   "hi": 1,
   "hr": 1,
+  "hu": 1,
   "it": 1,
   "id": 1,
   "ja": 1,

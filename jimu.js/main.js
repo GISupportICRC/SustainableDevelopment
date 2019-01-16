@@ -210,9 +210,10 @@ define([
       breakPoints: [600, 1280]
     }, jimuConfig);
 
-    window.wabVersion = '2.8';
-    // window.productVersion = 'Online 6.1';
-    window.productVersion = 'Web AppBuilder for ArcGIS (Developer Edition) 2.8';
+
+    window.wabVersion = '2.9';
+    // window.productVersion = 'Online 6.2';
+    window.productVersion = 'Web AppBuilder for ArcGIS (Developer Edition) 2.9';
     // window.productVersion = 'Portal for ArcGIS 10.5.1';
 
     function initApp() {

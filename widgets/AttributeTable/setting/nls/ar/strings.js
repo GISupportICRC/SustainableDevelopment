@@ -5,6 +5,12 @@ define({
   "actions": "تكوين حقول الطبقة",
   "field": "حقل",
   "alias": "اسم مستعار",
+  "url": "عنوان URL",
+  "sortField": "فرز الحقل",
+  "sortOrderTooltips": {
+    "toDescending": "تغيير إلى ترتيب تنازلي",
+    "toAscending": "تغيير إلى ترتيب تصاعدي"
+  },
   "visible": "مرئي",
   "linkField": "حقل الرابط",
   "noLayers": "لا تنوفر طبقات معالم متاحة",

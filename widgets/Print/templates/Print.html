@@ -178,6 +178,21 @@
                         </tr>
                     </table>
                 </div>
+                <div style="font-weight:bold;">
+                    ${nls.forceFeatureAttributes}:
+                </div>
+                <div data-dojo-type="dijit/form/Form" data-dojo-attach-point="forceAttributesFormDijit">
+                    <table cellspacing="5">
+                        <tr>
+                            <td style="vertical-align:middle;">
+                                ${nls.includeFeatureAttributes}:
+                            </td>
+                            <td>
+                                <input type="checkbox" data-dojo-type="dijit/form/CheckBox" data-dojo-props="name:'forceFeatureAttributes',value:true,checked:false" />
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
         <div class="jimu-btn" data-dojo-attach-point="printButtonDijit"

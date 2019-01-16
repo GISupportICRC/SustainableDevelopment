@@ -34,5 +34,7 @@ define({
   "print": "Stampa",
   "clearList": "Elimina stampe",
   "creatingPrint": "Creazione stampa",
-  "printError": "Errore. Riprovare"
+  "printError": "Errore. Riprovare",
+  "forceFeatureAttributes": "Attributi delle feature",
+  "includeFeatureAttributes": "Includi attributi"
 });

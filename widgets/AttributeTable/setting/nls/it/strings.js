@@ -5,6 +5,12 @@ define({
   "actions": "Configura campi layer",
   "field": "Campo",
   "alias": "Alias",
+  "url": "URL",
+  "sortField": "campo Ordinamento",
+  "sortOrderTooltips": {
+    "toDescending": "Cambia in ordine discendente",
+    "toAscending": "Cambia in ordine ascendente"
+  },
   "visible": "Visibile",
   "linkField": "Campo collegamento",
   "noLayers": "Nessun feature layer non disponibile",

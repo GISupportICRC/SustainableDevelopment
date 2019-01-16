@@ -34,5 +34,7 @@ define({
   "print": "Ispis",
   "clearList": "Izbriši ispise",
   "creatingPrint": "Stvaranje ispisa",
-  "printError": "Pogreška, pokušajte ponovno"
+  "printError": "Pogreška, pokušajte ponovno",
+  "forceFeatureAttributes": "Atributi geoobjekata",
+  "includeFeatureAttributes": "Uključi atribute"
 });

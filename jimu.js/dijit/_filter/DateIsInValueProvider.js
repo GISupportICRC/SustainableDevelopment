@@ -51,6 +51,7 @@ define([
         });
 
         var values = ['thisWeek', 'thisMonth', 'thisQuarter', 'thisYear'];
+        // var values = ['theseDays', 'thisWeek', 'thisMonth', 'thisQuarter', 'thisYear'];
         return values.forEach(lang.hitch(this, function(v){
           this.dateTypeSelect.addOption({
             value: v,

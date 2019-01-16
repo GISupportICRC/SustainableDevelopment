@@ -12,11 +12,11 @@
       "purple",
       "red"
     ],
-    "version": "2.8",
+    "version": "2.9",
     "sharedTheme": {
       "isPortalSupport": true,
       "useHeader": false,
-      "useLogo": true
+      "useLogo": false
     },
     "customStyles": {
       "mainBackgroundColor": "#107d94"
@@ -28,7 +28,7 @@
   "title": "Sustainable Development in Humanitarian Action Atlas",
   "subtitle": "",
   "keepAppState": true,
-  "logo": "images/ICRC_IFRC_Logo.png",
+  "logo": "images/logo.png",
   "geometryService": "https://utility.arcgisonline.com/arcgis/rest/services/Geometry/GeometryServer",
   "links": [],
   "widgetOnScreen": {
@@ -42,7 +42,7 @@
           "height": 40,
           "relativeTo": "browser"
         },
-        "version": "2.8",
+        "version": "2.9",
         "id": "themes_FoldableTheme_widgets_HeaderController_Widget_1",
         "name": "HeaderController"
       },
@@ -64,7 +64,7 @@
           "bottom": 25,
           "relativeTo": "map"
         },
-        "version": "2.8",
+        "version": "2.9",
         "id": "widgets_Scalebar_Widget_2",
         "name": "Scalebar"
       },
@@ -75,7 +75,7 @@
           "top": 5,
           "relativeTo": "map"
         },
-        "version": "2.8",
+        "version": "2.9",
         "id": "widgets_Search_Widget_3",
         "name": "Search"
       },
@@ -86,7 +86,7 @@
           "bottom": 5,
           "relativeTo": "map"
         },
-        "version": "2.8",
+        "version": "2.9",
         "id": "widgets_Coordinate_Widget_4",
         "name": "Coordinate"
       },
@@ -100,7 +100,7 @@
         "placeholderIndex": 1,
         "id": "_10",
         "name": "About",
-        "version": "2.8",
+        "version": "2.9",
         "closeable": true,
         "uri": "widgets/About/Widget",
         "config": "configs/About/config__10.json",
@@ -115,7 +115,7 @@
         "placeholderIndex": 1,
         "id": "_6",
         "name": "BasemapGallery",
-        "version": "2.8",
+        "version": "2.9",
         "closeable": true,
         "uri": "widgets/BasemapGallery/Widget",
         "config": "configs/BasemapGallery/config__6.json"
@@ -129,8 +129,7 @@
         "placeholderIndex": 1,
         "id": "_7",
         "name": "Legend",
-        "label": "Legend",
-        "version": "2.8",
+        "version": "2.9",
         "closeable": true,
         "uri": "widgets/Legend/Widget",
         "config": "configs/Legend/config__7.json"
@@ -144,7 +143,7 @@
         "placeholderIndex": 1,
         "id": "_8",
         "name": "Print",
-        "version": "2.8",
+        "version": "2.9",
         "closeable": true,
         "uri": "widgets/Print/Widget",
         "config": "configs/Print/config__8.json"
@@ -160,9 +159,9 @@
         "placeholderIndex": 1,
         "id": "_9",
         "name": "ICRCFilterSustainableDevelopment",
-        "version": "2.8",
         "closeable": true,
-        "uri": "widgets/ICRCFilterSustainableDevelopment/Widget"
+        "uri": "widgets/ICRCFilterSustainableDevelopment/Widget",
+        "version": "2.8"
       },
       {
         "uri": "widgets/OverviewMap/Widget",
@@ -172,7 +171,7 @@
           "zIndex": 1,
           "relativeTo": "map"
         },
-        "version": "2.8",
+        "version": "2.9",
         "id": "widgets_OverviewMap_Widget_10",
         "name": "OverviewMap"
       },
@@ -183,7 +182,7 @@
           "top": 75,
           "relativeTo": "map"
         },
-        "version": "2.8",
+        "version": "2.9",
         "id": "widgets_HomeButton_Widget_11",
         "name": "HomeButton"
       },
@@ -194,19 +193,19 @@
           "top": 110,
           "relativeTo": "map"
         },
-        "version": "2.8",
+        "version": "2.9",
         "id": "widgets_MyLocation_Widget_12",
         "name": "MyLocation"
       },
       {
         "uri": "widgets/AttributeTable/Widget",
-        "visible": false,
         "position": {
           "relativeTo": "browser"
         },
-        "version": "2.8",
+        "version": "2.9",
         "id": "widgets_AttributeTable_Widget_13",
-        "name": "AttributeTable"
+        "name": "AttributeTable",
+        "config": "configs/AttributeTable/config_widgets_AttributeTable_Widget_13.json"
       },
       {
         "uri": "widgets/Splash/Widget",
@@ -214,7 +213,7 @@
         "position": {
           "relativeTo": "browser"
         },
-        "version": "2.8",
+        "version": "2.9",
         "id": "widgets_Splash_Widget_14",
         "name": "Splash"
       },
@@ -225,7 +224,7 @@
           "left": 7,
           "relativeTo": "map"
         },
-        "version": "2.8",
+        "version": "2.9",
         "id": "widgets_ZoomSlider_Widget_15",
         "name": "ZoomSlider"
       },
@@ -239,7 +238,7 @@
         },
         "id": "widgets_ExtentNavigate_Widget_16",
         "name": "ExtentNavigate",
-        "version": "2.8"
+        "version": "2.9"
       },
       {
         "uri": "widgets/FullScreen/Widget",
@@ -249,7 +248,7 @@
           "left": 7,
           "relativeTo": "map"
         },
-        "version": "2.8",
+        "version": "2.9",
         "id": "widgets_FullScreen_Widget_17",
         "name": "FullScreen"
       }
@@ -289,7 +288,26 @@
         "relativeTo": "map"
       }
     },
-    "widgets": [],
+    "widgets": [
+      {
+        "name": "LayerList",
+        "label": "Activate Layer For Review",
+        "version": "2.9",
+        "uri": "widgets/LayerList/Widget",
+        "config": "configs/LayerList/config_widgets_LayerList_Widget_18.json",
+        "index": 2,
+        "id": "widgets_LayerList_Widget_18"
+      },
+      {
+        "name": "Edit",
+        "label": "Review Submitted data",
+        "version": "2.9",
+        "uri": "widgets/Edit/Widget",
+        "config": "configs/Edit/config_widgets_Edit_Widget_19.json",
+        "index": 4,
+        "id": "widgets_Edit_Widget_19"
+      }
+    ],
     "groups": []
   },
   "mobileLayout": {
@@ -324,7 +342,7 @@
       "height": 29
     }
   },
-  "wabVersion": "2.8",
+  "wabVersion": "2.9",
   "isTemplateApp": true,
   "isWebTier": false,
   "httpProxy": {

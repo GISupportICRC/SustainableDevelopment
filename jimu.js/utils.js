@@ -512,7 +512,7 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
             default:
               // remember that NaN === NaN returns false
               if (isNaN(x[p]) && isNaN(y[p]) && typeof x[p] === 'number' && typeof y[p] === 'number') {
-                return true;
+                continue;
               }
               if (x[p] !== y[p]) {
                 return false;
@@ -1162,8 +1162,32 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
     }
   };
 
+  mo.isNotEmptyStringArray = function(strArray, /* optional */ trim){
+    for(var key = 0; key < strArray.length; key++){
+      var str = strArray[key];
+      var strVal = str.value ? str.value : str;
+      var isNotEmpty = mo.isNotEmptyString(strVal, trim);
+      if(!isNotEmpty){
+        return false;
+      }
+    }
+    return true;
+  };
+
   mo.isValidNumber = function(num){
     return typeof num === 'number' && !isNaN(num);
+  };
+
+  mo.isValidNumberArray = function(numArray){
+    for(var key = 0; key < numArray.length; key++){
+      var num = numArray[key];
+      num = (num.value || num.value === 0) ? num.value : num;
+      var isValid = mo.isValidNumber(num);
+      if(!isValid){
+        return false;
+      }
+    }
+    return true;
   };
 
   mo.isValidDate = function(date){
@@ -1506,78 +1530,82 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
       .then(function(values){
         var layerDefinition = defVals.layerDefinition;
         var fieldPopupInfo = defVals.fieldPopupInfo;
-        var valueLabels = [];
-        var fieldInfo = mo.getFieldInfoByFieldName(layerDefinition.fields, fieldName);
-        var codedValueObj = null;//{value:label}
-        var isNumberField = mo.isNumberField(fieldInfo.type);
-        var isDateField = fieldInfo.type === 'esriFieldTypeDate' ? true : false;
-        if(fieldInfo){
-          if(isNumberField){
-            values = array.map(values, function(v){
-              var r = parseFloat(v);
-              if(isNaN(r)){
-                r = null;
-              }
-              return r;
-            });
-          }else if(isDateField){
-            values = array.map(values, lang.hitch(this, function(v) {
-              if(mo.isValidDate(v)){
-                //convert it to num when server returns a purely numeric string
-                // var numExp = new RegExp("^[0-9]*$");
-                // if(typeof v === 'string' && numExp.test(v)){
-                //   v = parseInt(v, 10);
-                // }
-                // var r = mo.localizeDateByFieldInfo(v, fieldPopupInfo);
-                //display locate time to user
-                var dFormat = fieldPopupInfo ? fieldPopupInfo.format.dateFormat : '';
-                var newV = dFormat.indexOf('Time') < 0? v: mo.getTime(new Date(v));
-                var r = mo.localizeDateByFieldInfo(new Date(newV), fieldPopupInfo);
-                return r;
-              }else{
-                return v;
-              }
-            }));
-          }
-          if(fieldInfo.domain && fieldInfo.domain.codedValues && fieldInfo.domain.codedValues.length > 0){
-            codedValueObj = {};
-            array.forEach(fieldInfo.domain.codedValues, function(item){
-              codedValueObj[item.code] = item.name;
-            });
-          }else if(layerDefinition.typeIdField === fieldName){
-            codedValueObj = {};
-            array.forEach(layerDefinition.types, function(item){
-              codedValueObj[item.id] = item.name;
-            });
-          }
-        }
-        valueLabels = array.map(values, function(value){
-          var label = null;
-          if(value === null || value === undefined){
-            label = '<Null>';
-          }else{
-            if(codedValueObj && codedValueObj.hasOwnProperty(value)){
-              label = codedValueObj[value];
-            }else{
-              if(isNumberField){
-                if(fieldPopupInfo){
-                  label = mo.localizeNumberByFieldInfo(value, fieldPopupInfo);
-                }else{
-                  label = mo.localizeNumber(value);
-                }
-              }else{
-                label = value;
-              }
-            }
-          }
-          return {
-            value: value,
-            label: label
-          };
-        });
-        return valueLabels;
+        return mo._getValues(layerDefinition, fieldPopupInfo, fieldName, values);
       });
     });
+  };
+
+  mo._getValues = function(layerDefinition, fieldPopupInfo, fieldName, values){
+    var valueLabels = [];
+    var fieldInfo = mo.getFieldInfoByFieldName(layerDefinition.fields, fieldName);
+    var codedValueObj = null;//{value:label}
+    var isNumberField = mo.isNumberField(fieldInfo.type);
+    var isDateField = fieldInfo.type === 'esriFieldTypeDate' ? true : false;
+    if(fieldInfo){
+      if(isNumberField){
+        values = array.map(values, function(v){
+          var r = parseFloat(v);
+          if(isNaN(r)){
+            r = null;
+          }
+          return r;
+        });
+      }else if(isDateField){
+        values = array.map(values, lang.hitch(this, function(v) {
+          if(mo.isValidDate(v)){
+            //convert it to num when server returns a purely numeric string
+            // var numExp = new RegExp("^[0-9]*$");
+            // if(typeof v === 'string' && numExp.test(v)){
+            //   v = parseInt(v, 10);
+            // }
+            // var r = mo.localizeDateByFieldInfo(v, fieldPopupInfo);
+            //display locate time to user
+            var dFormat = fieldPopupInfo ? fieldPopupInfo.format.dateFormat : '';
+            var newV = dFormat.indexOf('Time') < 0? v: mo.getTime(new Date(v));
+            var r = mo.localizeDateByFieldInfo(new Date(newV), fieldPopupInfo);
+            return r;
+          }else{
+            return v;
+          }
+        }));
+      }
+      if(fieldInfo.domain && fieldInfo.domain.codedValues && fieldInfo.domain.codedValues.length > 0){
+        codedValueObj = {};
+        array.forEach(fieldInfo.domain.codedValues, function(item){
+          codedValueObj[item.code] = item.name;
+        });
+      }else if(layerDefinition.typeIdField === fieldName){
+        codedValueObj = {};
+        array.forEach(layerDefinition.types, function(item){
+          codedValueObj[item.id] = item.name;
+        });
+      }
+    }
+    valueLabels = array.map(values, function(value){
+      var label = null;
+      if(value === null || value === undefined){
+        label = '<Null>';
+      }else{
+        if(codedValueObj && codedValueObj.hasOwnProperty(value)){
+          label = codedValueObj[value];
+        }else{
+          if(isNumberField){
+            if(fieldPopupInfo){
+              label = mo.localizeNumberByFieldInfo(value, fieldPopupInfo);
+            }else{
+              label = mo.localizeNumber(value);
+            }
+          }else{
+            label = value;
+          }
+        }
+      }
+      return {
+        value: value,
+        label: label
+      };
+    });
+    return valueLabels;
   };
 
   mo._getUniqueValues = function(featureOrImageLayerUrl, fieldName, where, layerDefinition){
@@ -2187,7 +2215,24 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
         }
       }
       return ret;
+    },
+
+    compareUrl: function(url1, url2) {
+      var _url1, _url2;
+      _url1 = this.getUrlPath(url1);
+      _url2 = this.getUrlPath(url2);
+
+      _url1 = portalUrlUtils.removeProtocol(_url1.toString().toLowerCase()).replace(/\/+/g, '/');
+      _url2 = portalUrlUtils.removeProtocol(_url2.toString().toLowerCase()).replace(/\/+/g, '/');
+
+      return _url1 === _url2;
+    },
+
+    getUrlPath: function(url) {
+      var urlObject = esriUrlUtils.urlToObject(url);
+      return urlObject.path;
     }
+
   };
 
   mo.processUrlInWidgetConfig = function(url, widgetFolderUrl){
@@ -2230,39 +2275,6 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
 
   mo.getDefaultWebMapThumbnail = function(){
     return require.toUrl('jimu/images/webmap.png');
-  };
-
-  //use map thumnail as default thumnail
-  mo.getDefaultThumnail = function (itemInfo, mapItemId, portal) {
-    var def = new Deferred();
-    portal.getItemById(mapItemId).then(function (res) {
-      var map = res;
-
-      if (map && map.thumbnail && map.thumbnailUrl) {
-        //use map thumbnail
-        def.resolve(map.thumbnailUrl);
-      } else if (itemInfo.thumbnailURL) {
-        //use the url you set, when creat
-        var staticImagesUrl = portal.staticImagesUrl;
-        if ((portal.allSSL || location.protocol === "https:") && staticImagesUrl) {
-          staticImagesUrl = staticImagesUrl.replace('http:', 'https:');
-        }
-
-        var thumbnailURL = staticImagesUrl + itemInfo.thumbnailURL;
-
-        if (portal.isPortal &&
-          itemInfo.thumbnailURL && itemInfo.thumbnailURL.indexOf("http") !== 0) {
-          thumbnailURL = window.location.protocol + "//" + window.location.host + itemInfo.thumbnailURL;// staticImagesUrl is relative
-        }
-
-        def.resolve(thumbnailURL);
-      } else {
-        //set empty, use portal default thumbnail
-        def.resolve("");
-      }
-    });
-
-    return def;
   };
 
   mo.invertColor = function(hexTripletColor) {
@@ -3348,6 +3360,40 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
     return item;
   };
 
+  mo.getDefaultPopupInfo = function(object, title, fieldNames) {
+    // return popupInfo with all fieldInfos if the fieldName is null;
+    var popupInfo = null;
+    if(object && object.fields) {
+      popupInfo = {
+        title: title,
+        fieldInfos:[],
+        description: null,
+        showAttachments: true,
+        mediaInfos: []
+      };
+      array.forEach(object.fields, function(field){
+        var isValidField = false;
+        if(fieldNames) {
+          var isValidFieldName = array.some(fieldNames, lang.hitch(this, function(fieldName) {
+            return fieldName && (field.name.toLowerCase() === fieldName.toLowerCase());
+          }));
+          if(isValidFieldName) {
+            isValidField = true;
+          }
+        } else {
+          isValidField = true;
+        }
+        if(isValidField) {
+          var fieldInfo = this.getDefaultPortalFieldInfo(field);
+          fieldInfo.visible = true;
+          fieldInfo.isEditable = field.editable;
+          popupInfo.fieldInfos.push(fieldInfo);
+        }
+      }, this);
+    }
+    return popupInfo;
+  };
+
   mo._tryLocaleNumber = function(value) {
     var result = mo.localizeNumber(value);
     if (result === null || result === undefined) {
@@ -3364,6 +3410,7 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
     return result;
   };
 
+  //fieldInfos: layerDefinition.fields
   mo.getFieldInfoByFieldName = function(fieldInfos, fieldName) {
     var fieldInfo = null;
     if (fieldInfos && fieldInfos.length > 0) {
@@ -3379,9 +3426,10 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
     return fieldInfo;
   };
 
+  //fieldInfos: popupFieldsInfo
   mo.getDateFieldFormatByFieldName = function(fieldInfos, fieldName) {
     if (fieldInfos && fieldInfos.length > 0) {
-      for(var key = 0; key <= fieldInfos.length; key++){
+      for(var key = 0; key < fieldInfos.length; key++){
         var item = fieldInfos[key];
         if (item.fieldName === fieldName) {
           if(item.format && item.format.dateFormat){
@@ -3394,6 +3442,43 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
       return '';
     }
     return '';
+  };
+
+  //layerField: https://developers.arcgis.com/web-map-specification/objects/field/
+  //popupField: https://developers.arcgis.com/web-map-specification/objects/fieldInfo/
+  mo.completePopupFieldFromLayerField = function(layerFields, popupFields){
+    for(var layerKey in layerFields){
+      var layerFieldName = layerFields[layerKey].name;
+      var isExist = false;
+      for(var popupKey in popupFields){
+        if(popupFields[popupKey].fieldName === layerFieldName){
+          isExist = true;
+          break;
+        }
+      }
+      if(!isExist){
+        var _fieldInfo = mo.getPopupFieldFromLayerField(layerFields[layerKey]);
+        popupFields.push(_fieldInfo);
+      }
+    }
+    return popupFields;
+  };
+
+  mo.getPopupFieldFromLayerField = function(layerField){
+    var _fieldInfo = {
+      //pro publish (no edit by map viewer in some old versions)
+      'fieldName': layerField.name,
+      'isEditable': layerField.editable,
+      'label': layerField.alias,
+      'visible': layerField.visible ? layerField.visible : false,
+
+      //other ways(include attrs above)
+      //stringFieldOption is only for string field: textbox, textarea, richtext
+      'stringFieldOption': layerField.type === 'esriFieldTypeString' ? 'textbox': null,
+      'tooltips': '',
+      'domain': layerField.domain ? layerField.domain : null
+    };
+    return _fieldInfo;
   };
 
   mo.containsNonLatinCharacter = function(string) {
@@ -4263,6 +4348,10 @@ function(lang, array, html, has, config, ioQuery, query, nlt, Deferred, all, on,
   mo.getClientFeaturesFromMap = function(map, featureLayer, useSelection, filterByExtent) {
     var features = [];
     var isSelectedFeatures = false;
+
+    if(!featureLayer){
+      return;
+    }
 
     if (useSelection) {
       if (featureLayer.getSelectedFeatures().length > 0) {

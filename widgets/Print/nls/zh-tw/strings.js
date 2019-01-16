@@ -34,5 +34,7 @@ define({
   "print": "列印",
   "clearList": "清除列印",
   "creatingPrint": "正在建立列印",
-  "printError": "出現錯誤，請重試"
+  "printError": "出現錯誤，請重試",
+  "forceFeatureAttributes": "圖徵屬性",
+  "includeFeatureAttributes": "包含屬性"
 });

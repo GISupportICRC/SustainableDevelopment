@@ -34,5 +34,7 @@ define({
   "print": "प्रिंट करें",
   "clearList": "साफ प्रिंट",
   "creatingPrint": "प्रिंट बनाना",
-  "printError": "त्रुटि, फिर से कोशिश करें"
+  "printError": "त्रुटि, फिर से कोशिश करें",
+  "forceFeatureAttributes": "सुविधा एट्रिब्यूट",
+  "includeFeatureAttributes": "एट्रिब्यूट शामिल करें"
 });

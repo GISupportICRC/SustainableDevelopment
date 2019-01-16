@@ -12,81 +12,20 @@ define(['dojo/_base/declare',
   esriLang, Graphic, symbolJsonUtils) {
 
   return declare(null, {
-    //popupFieldInfos
+    //popupInfo
     //featureLayer
     //floatNumberFieldDecimalPlace
     constructor: function(options) {
       if (options) {
         lang.mixin(this, options);
       }
-      if (!this.popupFieldInfos) {
-        this.popupFieldInfos = {};
+      if (!this.popupInfo) {
+        this.popupInfo = {};
       }
       if (!this.featureLayer) {
         this.featureLayer = {};
       }
       this.floatNumberFieldDecimalPlace = {};
-    },
-
-    getClientStatisticUtilsOptions: function(options, forExtraSTD, hasStatisticsed) {
-      var chartConfig = options.chartConfig;
-      var mode = chartConfig.mode;
-      //layerOption
-      var layerOption = {};
-      if (options.featureLayer) {
-        layerOption.featureLayer = options.featureLayer;
-      }
-      if (typeof options.popupFieldInfos !== 'undefined') {
-        layerOption.popupFieldInfos = options.popupFieldInfos;
-      }
-      //clientStatusticsUtils options
-      var csuOptions = {
-        mode: mode,
-        forExtraSTD: forExtraSTD,
-        hasStatisticsed: hasStatisticsed,
-        features: options.features
-      };
-
-      if (typeof options.filterByExtent !== 'undefined') {
-        csuOptions.filterByExtent = options.filterByExtent;
-      }
-
-      if (typeof chartConfig.labelField !== 'undefined' && mode === 'feature') {
-        csuOptions.clusterField = chartConfig.labelField;
-      }
-
-      if (typeof chartConfig.categoryField !== 'undefined' &&
-        (mode === 'category' || mode === 'count')) {
-        csuOptions.clusterField = chartConfig.categoryField;
-      }
-
-      if (chartConfig.valueFields && typeof chartConfig.valueFields !== 'undefined') {
-        csuOptions.valueFields = chartConfig.valueFields;
-      }
-
-      if (typeof chartConfig.operation !== 'undefined') {
-        csuOptions.operation = chartConfig.operation;
-      }
-
-      if (typeof chartConfig.sortOrder !== 'undefined') {
-        csuOptions.sortOrder = chartConfig.sortOrder;
-      }
-
-      if (typeof chartConfig.dateConfig !== 'undefined') {
-        csuOptions.dateConfig = chartConfig.dateConfig;
-      }
-
-      if (typeof chartConfig.nullValue !== 'undefined') {
-        csuOptions.nullValue = chartConfig.nullValue;
-      }
-
-      if (typeof chartConfig.maxLabels !== 'undefined') {
-        csuOptions.maxLabels = chartConfig.maxLabels;
-      }
-      return {
-        csuOptions: csuOptions,
-        layerOption: layerOption
-      };
     },
 
     setLayerFeatureLayer: function(featureLayer) {
@@ -95,9 +34,21 @@ define(['dojo/_base/declare',
       }
     },
 
-    setPopupInfo: function(popupFieldInfos) {
-      if (popupFieldInfos) {
-        this.popupFieldInfos = popupFieldInfos;
+    setSymbolLayer: function(symbolLayer) {
+      if (symbolLayer) {
+        this.symbolLayer = symbolLayer;
+      }
+    },
+
+    setPopupInfo: function(popupInfo) {
+      if (popupInfo) {
+        this.popupInfo = popupInfo;
+      }
+    },
+
+    setMap: function(map) {
+      if (map) {
+        this.map = map;
       }
     },
 
@@ -160,6 +111,7 @@ define(['dojo/_base/declare',
         this.calculateDecimalPlaceForFloatField(fields, features);
 
         data.forEach(lang.hitch(this, function(item) {
+          item.originalValues = lang.clone(item.values);
           valueFields.forEach(lang.hitch(this, function(fieldName, index) {
             var value = item.values[index];
             if (this.isFloatNumberField(fieldName)) {
@@ -302,8 +254,8 @@ define(['dojo/_base/declare',
           }
         }
         //use popup field info to override the calculated places
-        if (this.popupFieldInfos) {
-          var format = this.getFormatFromPopupInfo(this.popupFieldInfos, fieldName);
+        if (this.popupInfo) {
+          var format = this.getFormatFromPopupInfo(this.popupInfo, fieldName);
           if (format && format.places >= 0) {
             this.floatNumberFieldDecimalPlace[fieldName] = format.places;
           }
@@ -357,12 +309,12 @@ define(['dojo/_base/declare',
       return decimalPlace;
     },
 
-    getFormatFromPopupInfo: function(popupFieldInfos, fieldName) {
+    getFormatFromPopupInfo: function(popupInfo, fieldName) {
       var format = null;
-      if (!popupFieldInfos) {
+      if (!popupInfo) {
         return format;
       }
-      var fieldInfos = popupFieldInfos.fieldInfos;
+      var fieldInfos = popupInfo.fieldInfos;
       if (fieldInfos && fieldInfos.length > 0) {
         fieldInfos.forEach(function(item) {
           if (item.fieldName === fieldName) {
@@ -373,12 +325,12 @@ define(['dojo/_base/declare',
       return format;
     },
 
-    getAliasFromPopupInfo: function(popupFieldInfos, fieldName) {
+    getAliasFromPopupInfo: function(popupInfo, fieldName) {
       var label = fieldName;
-      if (!popupFieldInfos) {
+      if (!popupInfo) {
         return label;
       }
-      var fieldInfos = popupFieldInfos.fieldInfos;
+      var fieldInfos = popupInfo.fieldInfos;
       if (fieldInfos && fieldInfos.length > 0) {
         fieldInfos.forEach(function(item) {
           if (item.fieldName === fieldName) {
@@ -455,15 +407,15 @@ define(['dojo/_base/declare',
       }
     },
 
-    formatedDateByPopupInfoOrLocal: function(fieldName, fieldValue, popupFieldInfos) {
-      if (!popupFieldInfos) {
-        popupFieldInfos = this.popupFieldInfos;
+    formatedDateByPopupInfoOrLocal: function(fieldName, fieldValue, popupInfo) {
+      if (!popupInfo) {
+        popupInfo = this.popupInfo;
       }
 
       function getFormatInfo(fieldName) {
-        if (popupFieldInfos && esriLang.isDefined(popupFieldInfos.fieldInfos)) {
-          for (var i = 0, len = popupFieldInfos.fieldInfos.length; i < len; i++) {
-            var f = popupFieldInfos.fieldInfos[i];
+        if (popupInfo && esriLang.isDefined(popupInfo.fieldInfos)) {
+          for (var i = 0, len = popupInfo.fieldInfos.length; i < len; i++) {
+            var f = popupInfo.fieldInfos[i];
             if (f.fieldName === fieldName) {
               return f.format;
             }
@@ -522,7 +474,7 @@ define(['dojo/_base/declare',
           var a;
           //if pass "abc" into localizeNumber, it will return null
           if (fieldName && this.isNumberField(fieldName)) {
-            var popupFieldInfo = this.popupFieldInfos[fieldName];
+            var popupFieldInfo = this.popupInfo[fieldName];
             if (popupFieldInfo && lang.exists('format.places', popupFieldInfo)) {
               a = jimuUtils.localizeNumberByFieldInfo(value, popupFieldInfo);
             } else {
@@ -633,48 +585,126 @@ define(['dojo/_base/declare',
       return dateTemplate;
     },
 
-    _getFeatureLayerGraphics: function(filterByExtent) {
-      var graphics = null;
-      if (this.map) {
-        graphics = jimuUtils.getClientFeaturesFromMap(this.map, this.featureLayer, false, !!filterByExtent);
+    _getSymbolLayerGraphics: function(filterByExtent) {
+      if (!this.symbolLayer) {
+        return null;
       }
+      var isDynamicLayer = !!this.symbolLayer.refreshInterval;
+      if (!isDynamicLayer && this.symbolGraphics && this.symbolGraphics.filterByExtent === filterByExtent) {
+        return this.symbolGraphics.graphics;
+      }
+      var graphics = null;
+      if (this.map && this.symbolLayer) {
+        graphics = jimuUtils.getClientFeaturesFromMap(this.map, this.symbolLayer, false, !!filterByExtent);
+      }
+      this.symbolGraphics = {
+        filterByExtent: filterByExtent,
+        graphics: graphics
+      };
       return graphics;
     },
 
-    _getFeaturesByClusterfield: function(clusterField, label, filterByExtent, dateConfig) {
-      if (!this.features) {
-        this.features = this._getFeatureLayerGraphics(filterByExtent);
+    _isContainAttr: function(attributes, inputAttr) {
+      if (typeof inputAttr !== 'object' || typeof inputAttr !== 'object') {
+        return false;
       }
-      if (!this.features) {
+      var isContain = true;
+      for (var name in inputAttr) {
+        if (inputAttr.hasOwnProperty(name)) {
+          var val1 = inputAttr[name];
+          var val2 = attributes[name];
+          isContain = val1 === val2;
+        }
+      }
+      return isContain;
+    },
+
+    _getFeaturesByAttr: function(attributes, features) {
+      if (!features) {
         return;
       }
-      var features = null;
 
-      var cluseringObj = this.clientStatisticsUtils.getCluseringObj(clusterField, this.features, dateConfig);
-      var notNullLabelClusteringObj = cluseringObj.notNullLabelClusteringObj;
-      var nullLabelClusteringObj = cluseringObj.nullLabelClusteringObj;
+      var feature = null;
+
+      features.some(function(f) {
+        if (this._isContainAttr(f.attributes, attributes)) {
+          feature = f;
+          return true;
+        }
+        return false;
+      }.bind(this));
+
+      return feature;
+    },
+
+    _getFeaturesByClusterfield: function(clusterField, label, filterByExtent, dateConfig) {
+
+      var features = this._getSymbolLayerGraphics(filterByExtent);
+
+      if (!features) {
+        return;
+      }
+      var fs = null;
+
+      var cluseringObj = this.clientStatisticsUtils.getCluseringObj(clusterField, features, dateConfig);
+      var notNullLabelClusteringObj = cluseringObj.notNullLabel;
+      var nullLabelClusteringObj = cluseringObj.nullLabel;
       var assignCluseringObj = lang.mixin(notNullLabelClusteringObj, nullLabelClusteringObj);
 
       var obj = assignCluseringObj[label];
-      if (obj && obj.dataFeatures && obj.dataFeatures.length) {
-        features = obj.dataFeatures;
+      if (obj && obj.features && obj.features.length) {
+        fs = obj.features;
       }
-      return features;
+      return fs;
+    },
+
+    _getFeatureForSerieData: function(dataItem, dataOption, valueField) {
+      var clusterField = dataOption.clusterField;
+      var mode = dataOption.mode;
+      var filterByExtent = dataOption.filterByExtent;
+      var attributes = {};
+      attributes[clusterField] = dataItem.name;
+      if (mode === 'feature') {
+        return this._getFeatureBySerieDataItem(dataItem, clusterField, valueField, filterByExtent);
+      } else if (mode === 'category' || mode === 'count') {
+        return new Graphic(null, null, attributes);
+      }
+    },
+
+    _getFeatureBySerieDataItem: function(dataItem, clusterField, valueField, filterByExtent) {
+      var attributes = {};
+      attributes[clusterField] = dataItem.name;
+      var value = typeof dataItem.originValue !== 'undefined' ? dataItem.originValue : dataItem.value;
+      attributes[valueField] = Number(value);
+
+      var features = this._getSymbolLayerGraphics(filterByExtent);
+      return this._getFeaturesByAttr(attributes, features);
+    },
+
+    _getFeatureBycsuDataItem: function(dataItem, clusterField, valueField, vfIndex, filterByExtent) {
+      var attributes = {};
+      attributes[clusterField] = dataItem.label;
+      var values = dataItem.originalValues || dataItem.values;
+      var value = values && values[vfIndex];
+
+      attributes[valueField] = Number(value);
+
+      var features = this._getSymbolLayerGraphics(filterByExtent);
+      return this._getFeaturesByAttr(attributes, features);
     },
 
     /*    bind event to eCharts*/
     bindChartEvent: function(chart, options, data) {
       var filterByExtent = options.filterByExtent;
-      var chartConfig = options.chartConfig;
-      var clusterField = chartConfig.categoryField;
+      var clusterField = options.clusterField;
 
       var dateConfig = null;
-      if (chartConfig && typeof chartConfig.dateConfig !== 'undefined') {
-        dateConfig = chartConfig.dateConfig;
+      if (options.dateConfig !== 'undefined') {
+        dateConfig = options.dateConfig;
       }
 
-      this.highLightColor = chartConfig.highLightColor || '#00ffff';
-      var mode = chartConfig.mode;
+      this.highLightColor = options.highLightColor || '#00ffff';
+      var mode = options.mode;
       if (!this.map) {
         return;
       }
@@ -685,20 +715,27 @@ define(['dojo/_base/declare',
         if (evt.componentType !== 'series') {
           return;
         }
-
         var features = null;
-        this.features = this._getFeatureLayerGraphics(filterByExtent);
+        var symbolFeatures = this._getSymbolLayerGraphics(filterByExtent);
         if (mode === 'field') {
-          features = this.features;
+          features = symbolFeatures;
         } else {
-          //category: {category,valueFields,features:[f1,f2...]}
-          //count {fieldValue:value1,count:count1,features:[f1,f2...]}
-          var a = data[evt.dataIndex];
-          if (a) {
+          //category: {category,valueFields,}
+          //count {fieldValue:value1,count:count1}
+          var dataItem = data[evt.dataIndex];
+          if (dataItem) {
             if (mode === 'feature') {
-              features = a.features;
+              var valueField = evt.seriesName;
+              var vfIndex = evt.seriesIndex;
+              if (!valueField) {
+                return;
+              }
+              var feature = this._getFeatureBycsuDataItem(dataItem, clusterField, valueField, vfIndex, filterByExtent);
+              if (feature) {
+                features = [feature];
+              }
             } else {
-              var label = a.label;
+              var label = dataItem.label;
               if (typeof label !== 'undefined') {
                 features = this._getFeaturesByClusterfield(clusterField, label, filterByExtent, dateConfig);
               }
@@ -785,7 +822,8 @@ define(['dojo/_base/declare',
 
         //The outline of these features maybe overlapped by others,
         //so we need to put these features at the end of the featureLayer
-        if (this.features.length !== features.length && geoType === 'polygon') {
+        var symbolFeatures = this._getSymbolLayerGraphics(false);
+        if (symbolFeatures.length !== features.length && geoType === 'polygon') {
           features.forEach(lang.hitch(this, function(feature) {
             this.featureLayer.remove(feature);
           }));
@@ -956,8 +994,8 @@ define(['dojo/_base/declare',
       if (fieldInfo) {
         fieldAlias = fieldInfo.alias || fieldAlias;
       }
-      if (this.popupFieldInfos) {
-        fieldAlias = this.getAliasFromPopupInfo(this.popupFieldInfos, fieldAlias);
+      if (this.popupInfo) {
+        fieldAlias = this.getAliasFromPopupInfo(this.popupInfo, fieldAlias);
       }
       return fieldAlias;
     },
@@ -981,27 +1019,27 @@ define(['dojo/_base/declare',
       return n;
     },
     //assignee setting color to chart series
-    assigneeSettingColor: function(chartConfig, series, featureLayerForChartSymbologyChart) {
+    assigneeSettingColor: function(displayOption, series, dataOption) {
       if (!series || !series.length) {
         return series;
       }
-      var seriesStyle = chartConfig.seriesStyle;
+      var seriesStyle = displayOption.seriesStyle;
       if (!seriesStyle) {
         return series;
       }
 
       if (seriesStyle.type === 'layerSymbol') {
-        series = this._assigneeStyleLayerSymbolColor(series, featureLayerForChartSymbologyChart);
+        series = this._assigneeStyleLayerSymbolColor(series, dataOption);
       } else if (seriesStyle.type === 'series') {
-        series = this._assigneeStyleSeriesColor(chartConfig, series);
+        series = this._assigneeStyleSeriesColor(displayOption, series);
       } else if (seriesStyle.type === 'custom') {
-        series = this._assigneeStyleCustomColor(chartConfig, series);
+        series = this._assigneeStyleCustomColor(displayOption, series);
       }
       return series;
     },
 
-    _assigneeStyleCustomColor: function(chartConfig, series) {
-      var seriesStyle = chartConfig.seriesStyle;
+    _assigneeStyleCustomColor: function(displayOption, series) {
+      var seriesStyle = displayOption.seriesStyle;
       if (!seriesStyle || !seriesStyle.customColor) {
         return series;
       }
@@ -1097,13 +1135,13 @@ define(['dojo/_base/declare',
       }.bind(this));
     },
 
-    _assigneeStyleSeriesColor: function(chartConfig, series) {
-      var seriesStyle = chartConfig.seriesStyle;
+    _assigneeStyleSeriesColor: function(displayOption, series) {
+      var seriesStyle = displayOption.seriesStyle;
       if (!seriesStyle || !seriesStyle.styles || !seriesStyle.styles[0]) {
         return series;
       }
-      var mode = chartConfig.mode;
-      var area = chartConfig.area;
+      var mode = displayOption.mode;
+      var area = displayOption.area;
       return series.map(function(serie) {
         var matchStyle = null;
         var type = serie.type;
@@ -1141,18 +1179,18 @@ define(['dojo/_base/declare',
       }.bind(this));
     },
 
-    _assigneeStyleLayerSymbolColor: function(series, featureLayerForChartSymbologyChart) {
+    _assigneeStyleLayerSymbolColor: function(series, dataOption) {
       series.forEach(function(serie) {
+        var valueField = serie.name;
         var data = serie.data;
         if (data && data.length) {
           data.forEach(function(dataItem) {
-            var features = dataItem.features;
-            var color = this._getSymbolColorForDataItem(featureLayerForChartSymbologyChart, features);
+            var feature = this._getFeatureForSerieData(dataItem, dataOption, valueField);
+            var features = [feature];
+            var color = this._getSymbolColorForDataItem(features);
             if (color) {
               dataItem.itemStyle = {
-                normal: {
-                  color: color
-                }
+                color: color
               };
             }
           }.bind(this));
@@ -1164,14 +1202,11 @@ define(['dojo/_base/declare',
       if (!serie.itemStyle) {
         serie.itemStyle = {};
       }
-      if (!serie.itemStyle.normal) {
-        serie.itemStyle.normal = {};
-      }
       if (matchStyle && typeof matchStyle.color !== 'undefined') {
         if (Array.isArray(matchStyle.color)) {
-          serie.itemStyle.normal.color = matchStyle.color[0];
+          serie.itemStyle.color = matchStyle.color[0];
         } else {
-          serie.itemStyle.normal.color = matchStyle.color;
+          serie.itemStyle.color = matchStyle.color;
         }
       }
       if (matchStyle && typeof matchStyle.opacity !== 'undefined') {
@@ -1179,12 +1214,9 @@ define(['dojo/_base/declare',
           if (!serie.areaStyle) {
             serie.areaStyle = {};
           }
-          if (!serie.areaStyle.normal) {
-            serie.areaStyle.normal = {};
-          }
-          serie.areaStyle.normal.opacity = (1 - parseFloat(matchStyle.opacity / 10));
+          serie.areaStyle.opacity = (1 - parseFloat(matchStyle.opacity / 10));
         } else {
-          serie.itemStyle.normal.opacity = (1 - parseFloat(matchStyle.opacity / 10));
+          serie.itemStyle.opacity = (1 - parseFloat(matchStyle.opacity / 10));
         }
       }
       return serie;
@@ -1207,13 +1239,13 @@ define(['dojo/_base/declare',
       return style;
     },
 
-    _getSymbolColorForDataItem: function(featureLayer, features) {
+    _getSymbolColorForDataItem: function(features) {
       var color = false;
-      if (!featureLayer) {
+      if (!this.symbolLayer) {
         return color;
       }
-      var renderer = featureLayer.renderer;
-      var feature = features[0];
+      var renderer = this.symbolLayer.renderer;
+      var feature = features && features[0];
       if (!feature) {
         return color;
       }
@@ -1298,18 +1330,15 @@ define(['dojo/_base/declare',
       if (!item.itemStyle) {
         item.itemStyle = {};
       }
-      if (!item.itemStyle.normal) {
-        item.itemStyle.normal = {};
-      }
       if (matchStyle && typeof matchStyle.color !== 'undefined') {
         if (Array.isArray(matchStyle.color)) {
-          item.itemStyle.normal.color = matchStyle.color[0];
+          item.itemStyle.color = matchStyle.color[0];
         } else {
-          item.itemStyle.normal.color = matchStyle.color;
+          item.itemStyle.color = matchStyle.color;
         }
       }
       if (matchStyle && typeof matchStyle.opacity !== 'undefined') {
-        item.itemStyle.normal.opacity = (1 - parseFloat(matchStyle.opacity / 10));
+        item.itemStyle.opacity = (1 - parseFloat(matchStyle.opacity / 10));
       }
       return item;
     },
@@ -1321,11 +1350,8 @@ define(['dojo/_base/declare',
       if (!serie.itemStyle) {
         serie.itemStyle = {};
       }
-      if (!serie.itemStyle.normal) {
-        serie.itemStyle.normal = {};
-      }
       if (color) {
-        serie.itemStyle.normal.color = color;
+        serie.itemStyle.color = color;
       }
     },
 
@@ -1336,11 +1362,8 @@ define(['dojo/_base/declare',
       if (!dataItem.itemStyle) {
         dataItem.itemStyle = {};
       }
-      if (!dataItem.itemStyle.normal) {
-        dataItem.itemStyle.normal = {};
-      }
       if (color) {
-        dataItem.itemStyle.normal.color = color;
+        dataItem.itemStyle.color = color;
       }
     },
 
@@ -1356,15 +1379,15 @@ define(['dojo/_base/declare',
       }.bind(this));
     },
 
-    updateChartSeriesDisplayName: function(chartSeriesOption, chartConfig) {
+    updateChartSeriesDisplayName: function(chartSeriesOption, displayOption, dataOption) {
 
-      var clusterField = chartConfig.mode === 'feature' ?
-        chartConfig.labelField : chartConfig.categoryField;
-      var mode = chartConfig.mode;
+      var clusterField = dataOption.mode === 'feature' ?
+        dataOption.labelField : dataOption.categoryField;
+      var mode = dataOption.mode;
       var series = chartSeriesOption.series;
       var labels = [];
       //setting label
-      var seriesStyle = chartConfig.seriesStyle;
+      var seriesStyle = displayOption.seriesStyle;
 
       if (seriesStyle.type === 'custom') {
         var customColor = seriesStyle.customColor;
@@ -1434,24 +1457,6 @@ define(['dojo/_base/declare',
 
       chartSeriesOption.labels = null;
       chartSeriesOption.labels = labels;
-
-      this._removeUselessProtoTypeOfSeries(series);
-    },
-
-    _removeUselessProtoTypeOfSeries: function(series) {
-      series.forEach(function(serie) {
-        var data = serie.data;
-        if (data && data.length) {
-          data.forEach(function(dataItem) {
-            if (typeof dataItem.features !== 'undefined') {
-              delete dataItem.features;
-            }
-            if (typeof dataItem.unit !== 'undefined') {
-              delete dataItem.unit;
-            }
-          });
-        }
-      });
     }
 
   });

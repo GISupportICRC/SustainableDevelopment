@@ -34,5 +34,7 @@ define({
   "print": "인쇄",
   "clearList": "인쇄 지우기",
   "creatingPrint": "인쇄를 생성 중",
-  "printError": "오류가 있습니다. 다시 시도하세요."
+  "printError": "오류가 있습니다. 다시 시도하세요.",
+  "forceFeatureAttributes": "피처 속성",
+  "includeFeatureAttributes": "속성 포함"
 });

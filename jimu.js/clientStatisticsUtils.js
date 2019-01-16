@@ -32,8 +32,17 @@ define([
   //  getCountModeStatisticsData
   //  getFieldModeStatisticsData
 
+  //getCluseringObj
   //sortClientStatisticsData
   //getDataForMaxLabels
+
+  //convertingNullOrUndefinedAsPlaceholders
+  //separateFeaturesWhetherFieldValueNull
+  //keepFieldValueType
+  //calcValuesByFeaturesForCatetoryMode
+  //calcValuesByFeaturesForCountMode
+  //getValuesByValueFieldForFieldMode
+  //calcValueByOperation
 
   // Deprecated, Only used for Chart Widget StatisticsChart.js
   // getFeatureModeStatisticsInfo
@@ -42,7 +51,7 @@ define([
   // getFieldModeStatisticsInfo
 
   var mo = {
-    // return {label:'', values:[2000], features:[f1,f2...], unit /*optional*/}
+    // return {label:'', values:[2000], unit /*optional*/}
     getClietStatisticsData: function(options) {
       var mode = options.mode;
       if (mode === 'feature') {
@@ -61,12 +70,14 @@ define([
       var mode = options.mode;
       var sortOrder = options.sortOrder; //{isAsc:boolean,field:''}
       var valueFields = options.valueFields;
-      return this.sortStatisticsData(data, mode, sortOrder, options.clusterField, valueFields);
+      var clusterField = options.clusterField;
+      return this.sortStatisticsData(data, mode, sortOrder, clusterField, valueFields);
     },
 
     //Slice data by input number
     getDataForMaxLabels: function(data, maxLabels) {
-      if (typeof maxLabels === 'number' && maxLabels >= 0 && maxLabels < data.length) {
+      if (data && data.length && typeof maxLabels === 'number' &&
+        maxLabels > 0 && maxLabels < data.length) {
         return data.slice(0, maxLabels);
       } else {
         return data;
@@ -79,9 +90,9 @@ define([
       var features = options.features;
       var clusterField = options.clusterField;
       var valueFields = options.valueFields;
-      var showNullLabelData = options.showNullLabelData || true;
+      var showNullLabelData = options.showNullLabelData !== undefined ? options.showNullLabelData : true;
 
-      var separationFeatures = this._separateFeaturesWhetherFieldValueNull(clusterField, features);
+      var separationFeatures = this.separateFeaturesWhetherFieldValueNull(clusterField, features);
       var notNullLabelFeatures = separationFeatures.notNullLabelFeatures;
       var nullLabelFeatures = separationFeatures.nullLabelFeatures;
 
@@ -91,8 +102,8 @@ define([
 
       data = features.map(function(feature) {
         var attributes = feature.attributes;
-        var fieldValue = attributes[clusterField];
-        fieldValue = this._convertingNullOrUndefinedAsPlaceholders(fieldValue);
+        var fieldValue = attributes && attributes[clusterField];
+        fieldValue = this.convertingNullOrUndefinedAsPlaceholders(fieldValue);
         var option = {
           label: fieldValue,
           values: [],
@@ -108,16 +119,15 @@ define([
       return data;
     },
 
-    //options:{forExtraSTD, features, clusterField, valueFields, operation,
+    //options:{features, clusterField, valueFields, operation,
     //dateConfig, /*optional, Only date time type is valid*/
     //nullValue:boolean /*optional, for 'null' value, calcute as 0 or ignore it*/
     //showNullLabelData:boolean /* Whether to display the data item whitch cluster field is null */ }
 
-    //return [{label:'a',value:[10,100,2],features:[f1]},
+    //return [{label:'a',values:[10,100,2]},
     //unit/*optional, Only available if the cluster field is a datetime type*/]
     getCategoryModeStatisticsData: function(options) {
-      //For example: valueFields[0] = forExtraSTD ? valueFields[0] + operation:valueFields[0]
-      var forExtraSTD = options.forExtraSTD;
+      //For example: valueFields[0] = hasStatisticsed ? valueFields[0] + operation:valueFields[0]
       var hasStatisticsed = options.hasStatisticsed;
 
       var features = options.features;
@@ -128,120 +138,42 @@ define([
       //dateConfig:{isNeedFilled:boolean,dateFormatter:''//automatic, year, month, day, hour, minute, second}
       var dateConfig = options.dateConfig;
 
-      var showNullLabelData = options.showNullLabelData || true;
+      var showNullLabelData = options.showNullLabelData !== undefined ? options.showNullLabelData : true;
       var useNullValueAsZero = options.nullValue; //boolean
 
-      var data = []; //[{category:'a',valueFields:[10,100,2],dataFeatures:[f1,f2...]},...]
-      //{a:{valueFields:[10,100,2], dataFeatures:[f1,f2...]}}
+      var data = []; //[{label:'a',value:[10,100,2],...]
+
       var cluseringObj = this.getCluseringObj(clusterField, features, dateConfig);
-      var notNullLabelClusteringObj = cluseringObj.notNullLabelClusteringObj;
-      var nullLabelClusteringObj = cluseringObj.nullLabelClusteringObj;
+      //{label:{count:number, features:[f1,f2...], type},...}
+      var notNullLabelClusteringObj = cluseringObj.notNullLabel;
+      var nullLabelClusteringObj = cluseringObj.nullLabel;
 
       var notNullLabelClusteredData = clusterByLbabel.call(this, notNullLabelClusteringObj);
       var nullLabelClusteredData = clusterByLbabel.call(this, nullLabelClusteringObj);
 
       data = showNullLabelData ? notNullLabelClusteredData.concat(nullLabelClusteredData) : notNullLabelClusteredData;
-      //return [{category:'a',valueFields:[10,100,2],dataFeatures:[f1,f2...]},...]
+      //return [{category:'a',valueFields:[10,100,2],features:[f1,f2...]},...]
       /*jshint -W083 */
       function clusterByLbabel(clusteringObj) {
         var data = [];
         var categoryObj = null;
         for (var clusterFieldValue in clusteringObj) {
           categoryObj = clusteringObj[clusterFieldValue];
-          if (categoryObj && categoryObj.type === 'number') {
-            clusterFieldValue = Number(clusterFieldValue);
-          }
-          if (dateConfig && clusterFieldValue !== '_NULL&UNDEFINED_') {
-            clusterFieldValue = Number(clusterFieldValue);
-          }
-          var isStated = forExtraSTD || hasStatisticsed;
-          //calculate summarize values for one category
-          categoryObj.fieldsValues = valueFields.map(function(fieldName) {
-            var temporaryFieldName = fieldName;
-            if (isStated) {
-              var temporaryOperation = operation;
-              if (temporaryOperation === 'average') {
-                temporaryOperation = 'avg';
-              }
-              temporaryFieldName = this._mosaicFieldNameWithOperatorAndUpper(fieldName, temporaryOperation);
-            }
-            //for one category and for one valueField
-            var values = categoryObj.dataFeatures.map(lang.hitch(this, function(feature) {
-              var v = feature.attributes[temporaryFieldName];
-              if (typeof v === 'undefined' && isStated) {
-                temporaryFieldName = this._mosaicFieldNameWithOperatorAndLower(fieldName, temporaryOperation);
-                v = feature.attributes[temporaryFieldName];
-              }
-              return v;
-            }));
-            var summarizeValue;
-            if (values.length !== 0) {
-              summarizeValue = 0;
-              if (operation === 'max') {
-                summarizeValue = -Infinity;
-              } else if (operation === 'min') {
-                summarizeValue = Infinity;
-              }
-              //handle null value
-              if (useNullValueAsZero) {
-                values = values.map(function(val) {
-                  if (!this._isNumber(val)) {
-                    val = 0;
-                  }
-                  return val;
-                }.bind(this));
-              } else {
-                values = values.filter(function(val) {
-                  return this._isNumber(val);
-                }.bind(this));
-              }
-              //use nonNullValueCount to record how many feature values are not null for the fieldName
-              var count = 0;
-              values.forEach(lang.hitch(this, function(value) {
-                count++;
-                if (operation === 'average' || operation === 'sum') {
-                  summarizeValue += value;
-                } else if (operation === 'max') {
-                  summarizeValue = Math.max(summarizeValue, value);
-                } else if (operation === 'min') {
-                  summarizeValue = Math.min(summarizeValue, value);
-                }
-              }));
+          clusterFieldValue = this.keepFieldValueType(clusterFieldValue, categoryObj.type, dateConfig);
 
-              if (count > 0) {
-                if (operation === 'average') {
-                  //summarizeValue = summarizeValue / values.length;
-                  summarizeValue = summarizeValue / count;
-                }
-              } else {
-                //if all values for the fieldName are null, we set summarizeValue to null, no matter
-                //what's the value of operation
-                summarizeValue = null;
-              }
-            } else {
-              summarizeValue = null;
-            }
-
-            return {
-              field: fieldName,
-              value: summarizeValue
-            };
-          }.bind(this));
-
-          categoryObj.valueFields = categoryObj.fieldsValues.map(function(fieldsValue) {
-            return fieldsValue.value;
-          });
+          var values = this.calcValuesByFeaturesForCatetoryMode(valueFields, categoryObj,
+            hasStatisticsed, operation, useNullValueAsZero);
 
           data.push({
             label: clusterFieldValue,
-            values: categoryObj.valueFields,
-            features: categoryObj.dataFeatures,
+            values: values,
+            features: categoryObj.features,
             unit: categoryObj.unit
           });
         }
-
         return data;
       }
+
       return data;
     },
     //options:{features, clusterField,
@@ -251,68 +183,37 @@ define([
     //return [{label:'',values:count1,features:[f1,f2...]},
     //unit/*optional, Only available if the cluster field is a datetime type*/]
     getCountModeStatisticsData: function(options) {
-      var forExtraSTD = options.forExtraSTD;
       var hasStatisticsed = options.hasStatisticsed;
       var features = options.features;
       var clusterField = options.clusterField;
       //dateConfig:{isNeedFilled:boolean,dateFormatter:''//automatic, year, month, day, hour, minute, second}
       var dateConfig = options.dateConfig;
-      var showNullLabelData = options.showNullLabelData || true;
-      var data = []; //[{fieldValue:value1,count:count1,dataFeatures:[f1,f2...]}]
-      var isStated = (forExtraSTD || hasStatisticsed) && !dateConfig;
-      if (isStated) {
-        var separationFeatures = this._separateFeaturesWhetherFieldValueNull(clusterField, features);
-        var notNullLabelFeatures = separationFeatures.notNullLabelFeatures;
-        var nullLabelFeatures = separationFeatures.nullLabelFeatures;
-        features = showNullLabelData ? notNullLabelFeatures.concat(nullLabelFeatures) : notNullLabelFeatures;
-        var valueFields = ['STAT_COUNT']; //For HANA, count --> STAT_COUNT
-        data = features.map(function(feature) {
-          var attributes = feature.attributes;
-          var label = attributes[clusterField];
-          label = this._convertingNullOrUndefinedAsPlaceholders(label);
-          var option = {
-            label: label,
-            values: [],
-            features: [feature]
-          };
-          option.values = valueFields.map(function(fieldName) {
-            var v = attributes[fieldName];
-            if (typeof v === 'undefined') {
-              fieldName = jimuUtils.lowerCaseString(fieldName);
-              v = attributes[fieldName];
-            }
-            return v;
-          });
-          return option;
-        }.bind(this));
-        return data;
-      }
+      var showNullLabelData = options.showNullLabelData !== undefined ? options.showNullLabelData : true;
+      var data = []; //[{fieldValue:value1,count:count1,features:[f1,f2...]}]
+      var isStatisticsed = hasStatisticsed && !dateConfig;
 
-      //{fieldValue1:{count:count1,dataFeatures:[f1,f2...]},fieldValue2...}
+      //{fieldValue1:{count:count1,features:[f1,f2...]},...}
       var cluseringObj = this.getCluseringObj(clusterField, features, dateConfig);
-      var notNullLabelClusteringObj = cluseringObj.notNullLabelClusteringObj;
-      var nullLabelClusteringObj = cluseringObj.nullLabelClusteringObj;
+      var notNullLabelClusteringObj = cluseringObj.notNullLabel;
+      var nullLabelClusteringObj = cluseringObj.nullLabel;
 
       var notNullLabelClusteredData = clusterByLbabel.call(this, notNullLabelClusteringObj);
       var nullLabelClusteredData = clusterByLbabel.call(this, nullLabelClusteringObj);
       data = showNullLabelData ? notNullLabelClusteredData.concat(nullLabelClusteredData) : notNullLabelClusteredData;
-      //return [{category:'a',valueFields:[10,100,2],dataFeatures:[f1,f2...]},...]
+      //return [{label:'a',values:[10,100,2],unit},...]
       function clusterByLbabel(clusteringObj) {
         var data = [];
-        var fieldValueObj = null;
+        var categoryObj = null;
         for (var clusterFieldValue in clusteringObj) {
-          fieldValueObj = clusteringObj[clusterFieldValue]; //{count:count1,dataFeatures:[f1,f2...]}
-          if (fieldValueObj && fieldValueObj.type === 'number') {
-            clusterFieldValue = Number(clusterFieldValue);
-          }
-          if (dateConfig && clusterFieldValue !== '_NULL&UNDEFINED_') {
-            clusterFieldValue = Number(clusterFieldValue);
-          }
+          categoryObj = clusteringObj[clusterFieldValue]; //{count:count1,features:[f1,f2...]}
+          var values = this.calcValuesByFeaturesForCountMode(categoryObj, isStatisticsed); //STAT_COUNT
+          clusterFieldValue = this.keepFieldValueType(clusterFieldValue, categoryObj.type, dateConfig);
+
           data.push({
             label: clusterFieldValue,
-            values: [fieldValueObj.count],
-            features: fieldValueObj.dataFeatures,
-            unit: fieldValueObj.unit
+            values: values,
+            features: categoryObj.features,
+            unit: categoryObj.unit
           });
         }
         return data;
@@ -320,107 +221,76 @@ define([
       return data;
     },
 
-    _convertingNullOrUndefinedAsPlaceholders: function(value) {
-      if (value === null || value === undefined) {
-        return '_NULL&UNDEFINED_';
+    calcValuesByFeaturesForCountMode: function(categoryObj, hasStatisticsed) {
+
+      var values;
+      if (hasStatisticsed) {
+        var upperValueField = 'STAT_COUNT';
+        var lowerValueField = 'stat_count';
+        var features = categoryObj.features;
+        values = features.map(function(feature) {
+          var attributes = feature.attributes;
+          var v = attributes && attributes[upperValueField];
+          if (typeof v === 'undefined') {
+            v = attributes[lowerValueField];
+          }
+          return v;
+        }.bind(this));
+      } else {
+        values = [categoryObj.count];
       }
-      return value;
+      return values;
     },
 
-    //options:{forExtraSTD, features, valueFields, operation}
+    //options:{features, valueFields, operation}
     //nullValue:boolean /*optional, for 'null' value, calcute as 0 or ignore it*/
     //return {label:'',values: [1,2]}
     getFieldModeStatisticsData: function(options) {
-      //For example: valueFields[0] = forExtraSTD ? valueFields[0] + operation:valueFields[0]
-      var forExtraSTD = options.forExtraSTD;
+      //For example: valueFields[0] = hasStatisticsed ? valueFields[0] + operation:valueFields[0]
       var hasStatisticsed = options.hasStatisticsed;
 
       var features = options.features;
       var valueFields = options.valueFields;
       var operation = options.operation;
       var useNullValueAsZero = options.nullValue; //boolean
-      //[feature.attributes]
-      var attributesList = features.map(lang.hitch(this, function(feature) {
-        return feature.attributes;
+
+      var data = [];
+
+      data = valueFields.map(lang.hitch(this, function(fieldName) {
+        var vs = this.getValuesByValueFieldForFieldMode(fieldName, features, hasStatisticsed, operation);
+        var summarizeValue = this.calcValueByOperation(vs, operation, useNullValueAsZero);
+        return {
+          label: fieldName,
+          values: [summarizeValue]
+        };
       }));
 
-      var data = {};
-      var isStated = forExtraSTD || hasStatisticsed;
-      valueFields.forEach(lang.hitch(this, function(fieldName) {
-        var temporaryFieldName = fieldName;
-        if (isStated) {
+      return data;
+    },
 
-          var temporaryOperation = operation;
-          if (temporaryOperation === 'average') {
-            temporaryOperation = 'avg';
-          }
-          temporaryFieldName = this._mosaicFieldNameWithOperatorAndUpper(fieldName, temporaryOperation);
-        }
-        //init default statistics value
-        data[fieldName] = 0;
-        if (operation === 'max') {
-          data[fieldName] = -Infinity;
-        } else if (operation === 'min') {
-          data[fieldName] = Infinity;
-        }
-        var values = attributesList.map(function(attributes) {
-          var v = attributes[temporaryFieldName];
-          if (typeof v === 'undefined' && isStated) {
-            temporaryFieldName = this._mosaicFieldNameWithOperatorAndLower(fieldName, temporaryOperation);
-            v = attributes[temporaryFieldName];
-          }
-          return v;
-        }.bind(this));
-        var count = 0;
-        //handle null value
-        if (useNullValueAsZero) {
-          values = values.map(function(val) {
-            if (!this._isNumber(val)) {
-              val = 0;
-            }
-            return val;
-          }.bind(this));
-        } else {
-          values = values.filter(function(val) {
-            return this._isNumber(val);
-          }.bind(this));
-        }
-        values.forEach(lang.hitch(this, function(fieldValue) {
-          count++;
-          if (data.hasOwnProperty(fieldName)) {
-            if (operation === 'average' || operation === 'sum') {
-              data[fieldName] += fieldValue;
-            } else if (operation === 'max') {
-              data[fieldName] = Math.max(data[fieldName], fieldValue);
-            } else if (operation === 'min') {
-              data[fieldName] = Math.min(data[fieldName], fieldValue);
-            }
-          } else {
-            data[fieldName] = fieldValue;
-          }
-        }));
-
-        if (count > 0) {
-          if (operation === 'average') {
-            //data[fieldName] /= attributesList.length;
-            data[fieldName] = data[fieldName] / count;
-          }
-        } else {
-          data[fieldName] = null;
-        }
-      }));
-
-      //covert data object to data array
-      var arrayData = [];
-      for (var label in data) {
-        if (data.hasOwnProperty(label)) {
-          arrayData.push({
-            label: label,
-            values: [data[label]]
-          });
-        }
+    getValuesByValueFieldForFieldMode: function(fieldName, features, hasStatisticsed, operation) {
+      var cloneOperator = operation === 'average' ? 'avg' : operation;
+      if (hasStatisticsed) {
+        var upperFieldName = jimuUtils.upperCaseString(fieldName + '_' + cloneOperator);
+        var lowerFieldName = jimuUtils.lowerCaseString(fieldName + '_' + cloneOperator);
       }
-      return arrayData;
+      var values = features.map(lang.hitch(this, function(feature) {
+        var attributes = feature.attributes;
+        if (!attributes) {
+          return;
+        }
+        var v;
+        if (hasStatisticsed) {
+          v = attributes[upperFieldName];
+          if (typeof v === 'undefined') {
+            v = attributes[lowerFieldName];
+          }
+        } else {
+          v = attributes[fieldName];
+        }
+        return v;
+      }));
+      return values;
     },
 
     /*------------ Tool method -------------*/
@@ -511,6 +381,58 @@ define([
       return data;
     },
 
+    convertingNullOrUndefinedAsPlaceholders: function(value) {
+      if (value === null || value === undefined) {
+        return '_NULL&UNDEFINED_';
+      }
+      return value;
+    },
+
+    keepFieldValueType: function(clusterFieldValue, type, dateConfig) {
+      if (type === 'number') {
+        clusterFieldValue = Number(clusterFieldValue);
+      }
+      if (dateConfig && clusterFieldValue !== '_NULL&UNDEFINED_') {
+        clusterFieldValue = Number(clusterFieldValue);
+      }
+      return clusterFieldValue;
+    },
+
+    calcValuesByFeaturesForCatetoryMode: function(valueFields, categoryObj, hasStatisticsed, operation, nullValue) {
+      var values = valueFields.map(function(fieldName) {
+        var vs = this.getValuesByValueFieldForCategoryMode(fieldName, categoryObj.features,
+          hasStatisticsed, operation);
+        return this.calcValueByOperation(vs, operation, nullValue);
+      }.bind(this));
+      return values;
+    },
+
+    getValuesByValueFieldForCategoryMode: function(fieldName, features, hasStatisticsed, operation) {
+
+      var cloneOperator = operation === 'average' ? 'avg' : operation;
+      if (hasStatisticsed) {
+        var upperFieldName = jimuUtils.upperCaseString(fieldName + '_' + cloneOperator);
+        var lowerFieldName = jimuUtils.lowerCaseString(fieldName + '_' + cloneOperator);
+      }
+      var values = features.map(lang.hitch(this, function(feature) {
+        var attributes = feature.attributes;
+        if (!attributes) {
+          return;
+        }
+        var v;
+        if (hasStatisticsed) {
+          v = attributes[upperFieldName];
+          if (typeof v === 'undefined') {
+            v = attributes[lowerFieldName];
+          }
+        } else {
+          v = attributes[fieldName];
+        }
+        return v;
+      }));
+      return values;
+    },
+
     _isNumber: function(value) {
       var valueType = Object.prototype.toString.call(value).toLowerCase();
       return valueType === "[object number]";
@@ -545,7 +467,7 @@ define([
 
       var times = features.map(lang.hitch(this, function(feature) {
         var attributes = feature.attributes;
-        return attributes[fieldName];
+        return attributes && attributes[fieldName];
       }));
       times = times.filter(function(e) {
         return !!e;
@@ -590,7 +512,7 @@ define([
     },
 
     //get the categories by features(for category and count mode)
-    //hashObj:{[hashlabel]:{count:0, dateFeatures:[f1,f2...]}}
+    //hashObj:{[hashlabel]:{count:0, features:[f1,f2...]}}
     //return {notNullLabelHashObj:hashObj,nullLabelHashObj:hashObj}
     getCluseringObj: function(clusterField, features, dateConfig) {
 
@@ -599,10 +521,10 @@ define([
 
       if (dateConfig) {
         var clusterObj = this.getClusteringObjForDateType(clusterField, features, dateConfig);
-        notNullLabelClusteringObj = clusterObj.notNullLabelClusteringObj;
-        nullLabelClusteringObj = clusterObj.nullLabelClusteringObj;
+        notNullLabelClusteringObj = clusterObj.notNullLabel;
+        nullLabelClusteringObj = clusterObj.nullLabel;
       } else {
-        var separationFeatures = this._separateFeaturesWhetherFieldValueNull(clusterField, features);
+        var separationFeatures = this.separateFeaturesWhetherFieldValueNull(clusterField, features);
         var notNullLabelFeatures = separationFeatures.notNullLabelFeatures;
         var nullLabelFeatures = separationFeatures.nullLabelFeatures;
         notNullLabelClusteringObj = this.getClusteringObjByField(notNullLabelFeatures, clusterField);
@@ -610,28 +532,88 @@ define([
       }
 
       return {
-        notNullLabelClusteringObj: notNullLabelClusteringObj,
-        nullLabelClusteringObj: nullLabelClusteringObj
+        notNullLabel: notNullLabelClusteringObj,
+        nullLabel: nullLabelClusteringObj
       };
+    },
+
+    calcValueByOperation: function(values, operation, useNullValueAsZero) {
+
+      if (values && values.length === 1) {
+        if (!useNullValueAsZero) {
+          return values[0];
+        } else if (!this._isNumber(values[0])) {
+          return 0;
+        }
+      }
+
+      var summarizeValue;
+      if (values.length !== 0) {
+        summarizeValue = 0;
+        if (operation === 'max') {
+          summarizeValue = -Infinity;
+        } else if (operation === 'min') {
+          summarizeValue = Infinity;
+        }
+        //handle null value
+        if (useNullValueAsZero) {
+          values = values.map(function(val) {
+            if (!this._isNumber(val)) {
+              val = 0;
+            }
+            return val;
+          }.bind(this));
+        } else {
+          values = values.filter(function(val) {
+            return this._isNumber(val);
+          }.bind(this));
+        }
+        //use nonNullValueCount to record how many feature values are not null for the fieldName
+        var count = 0;
+        values.forEach(lang.hitch(this, function(value) {
+          count++;
+          if (operation === 'average' || operation === 'sum') {
+            summarizeValue += value;
+          } else if (operation === 'max') {
+            summarizeValue = Math.max(summarizeValue, value);
+          } else if (operation === 'min') {
+            summarizeValue = Math.min(summarizeValue, value);
+          }
+        }));
+
+        if (count > 0) {
+          if (operation === 'average') {
+            //summarizeValue = summarizeValue / values.length;
+            summarizeValue = summarizeValue / count;
+          }
+        } else {
+          //if all values for the fieldName are null, we set summarizeValue to null, no matter
+          //what's the value of operation
+          summarizeValue = null;
+        }
+      } else {
+        summarizeValue = null;
+      }
+      return summarizeValue;
     },
 
     getClusteringObjByField: function(features, clusterField) {
       var clusteringObj = {};
       features.forEach(lang.hitch(this, function(feature) {
         var attributes = feature.attributes;
-        var clusterFieldValue = attributes[clusterField];
+        var clusterFieldValue = attributes && attributes[clusterField];
         var type = typeof clusterFieldValue;
-        clusterFieldValue = this._convertingNullOrUndefinedAsPlaceholders(clusterFieldValue);
+        clusterFieldValue = this.convertingNullOrUndefinedAsPlaceholders(clusterFieldValue);
         var hashValue = null;
 
         if (clusteringObj.hasOwnProperty(clusterFieldValue)) {
           hashValue = clusteringObj[clusterFieldValue];
-          hashValue.dataFeatures.push(feature);
+          hashValue.features.push(feature);
           hashValue.count++;
         } else {
           hashValue = {
             count: 1,
-            dataFeatures: [feature],
+            features: [feature],
             type: type
           };
           clusteringObj[clusterFieldValue] = hashValue;
@@ -651,13 +633,13 @@ define([
       });
     },
 
-    _separateFeaturesWhetherFieldValueNull: function(field, features) {
+    separateFeaturesWhetherFieldValueNull: function(field, features) {
       var nullLabelFeatures = [],
         notNullLabelFeatures = [];
       if (Array.isArray(features)) {
         notNullLabelFeatures = features.filter(function(feature) {
           var attributes = feature.attributes;
-          var fieldValue = attributes[field];
+          var fieldValue = attributes && attributes[field];
           if (fieldValue === null || fieldValue === undefined) {
             nullLabelFeatures.push(feature);
           } else {
@@ -684,7 +666,7 @@ define([
     },
 
     getClusteringObjForDateType: function(clusterField, features, dateConfig) {
-      var separationFeatures = this._separateFeaturesWhetherFieldValueNull(clusterField, features);
+      var separationFeatures = this.separateFeaturesWhetherFieldValueNull(clusterField, features);
       var notNullLabelFeatures = separationFeatures.notNullLabelFeatures;
 
       var nullLabelFeatures = separationFeatures.nullLabelFeatures;
@@ -697,7 +679,7 @@ define([
         if (notNullLabelHashObj[clusterFieldValue]) {
           var oriHashValue = notNullLabelHashObj[clusterFieldValue];
           oriHashValue.count += hashValue.count;
-          oriHashValue.dataFeatures = oriHashValue.dataFeatures.concat(hashValue.dataFeatures);
+          oriHashValue.features = oriHashValue.features.concat(hashValue.features);
         } else {
           notNullLabelHashObj[clusterFieldValue] = hashValue;
         }
@@ -710,7 +692,7 @@ define([
         if (clusterObj[startTime]) {
           var oriHashValue = clusterObj[startTime];
           oriHashValue.count += valueObj.count;
-          oriHashValue.dataFeatures = oriHashValue.dataFeatures.concat(valueObj.dataFeatures);
+          oriHashValue.features = oriHashValue.features.concat(valueObj.features);
         } else {
           valueObj.originTime = clusterFieldValue;
           clusterObj[startTime] = valueObj;
@@ -722,7 +704,7 @@ define([
         var clusterFieldValue = attributes[clusterField];
         var value = {
           count: 1,
-          dataFeatures: features
+          features: features
         };
         notNullLabelHashObj[clusterFieldValue] = value;
 
@@ -751,13 +733,13 @@ define([
             var hashValue = {
               unit: dateUnit,
               count: 0,
-              dataFeatures: []
+              features: []
             };
             notNullLabelFeatures.forEach(lang.hitch(this, function(feature) {
               var attributes = feature.attributes;
-              var fieldValue = attributes[clusterField];
+              var fieldValue = attributes && attributes[clusterField];
               if (fieldValue >= start && fieldValue < end) {
-                hashValue.dataFeatures.push(feature);
+                hashValue.features.push(feature);
                 hashValue.count++;
               }
             }));
@@ -791,8 +773,8 @@ define([
         }
       }
       return {
-        notNullLabelClusteringObj: notNullLabelClusteringObj,
-        nullLabelClusteringObj: nullLabelClusteringObj
+        notNullLabel: notNullLabelClusteringObj,
+        nullLabel: nullLabelClusteringObj
       };
     },
     /* -------- Deprecated, Only used for Chart Widget StatisticsChart.js --------*/

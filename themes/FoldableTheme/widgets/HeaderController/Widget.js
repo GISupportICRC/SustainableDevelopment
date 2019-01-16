@@ -533,10 +533,10 @@ define([
             width: '100%'
           }
         }, node);
-        
+
         var logoNode = html.create('img', {
           'class': 'logo jimu-float-leading jimu-leading-margin1',
-          src: this.appConfig.logo ? this.appConfig.logo : this.folderUrl + 'images/ICRC_IFRC_Logo.png',
+          src: this.appConfig.logo ? this.appConfig.logo : this.folderUrl + 'images/app-logo.png',
           style: {
             width: '30px',
             height: '30px',

@@ -34,5 +34,7 @@ define({
   "print": "Imprimir",
   "clearList": "Limpar impressões",
   "creatingPrint": "Criando impressão",
-  "printError": "Erro, tente novamente"
+  "printError": "Erro, tente novamente",
+  "forceFeatureAttributes": "Atributos da feição",
+  "includeFeatureAttributes": "Incluir atributos"
 });

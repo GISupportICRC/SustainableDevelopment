@@ -32,7 +32,7 @@ define([
     'esri/dijit/Search',
     'esri/tasks/locator',
     'esri/layers/FeatureLayer',
-    'esri/InfoTemplate',
+    'esri/dijit/PopupTemplate',
     'esri/lang',
     'esri/tasks/query',
     './utils',
@@ -40,7 +40,7 @@ define([
   ],
   function(declare, lang, array, html, when, on, aspect, query, keys, Deferred, all,
     BaseWidget, LayerInfos, jimuUtils, Search, Locator,
-    FeatureLayer, InfoTemplate, esriLang, FeatureQuery, utils) {
+    FeatureLayer, PopupTemplate, esriLang, FeatureQuery, utils) {
     //To create a widget, you need to derive from BaseWidget.
     return declare([BaseWidget], {
       name: 'Search',
@@ -94,8 +94,8 @@ define([
                 enableButtonMode: false,
                 enableLabel: false,
                 enableInfoWindow: true,
-                enableHighlight: esriLang.isDefined(this.config.showInfoWindowOnSelect) ?
-                  !!this.config.showInfoWindowOnSelect : true,
+                enableHighlight: true,/*esriLang.isDefined(this.config.showInfoWindowOnSelect) ?
+                  !!this.config.showInfoWindowOnSelect : true,*/
                 showInfoWindowOnSelect: esriLang.isDefined(this.config.showInfoWindowOnSelect) ?
                   !!this.config.showInfoWindowOnSelect : true,
                 map: this.map,
@@ -122,9 +122,13 @@ define([
                   this._onClearSearch();
                 }
               })));
+
+              /*
               this.own(
                 aspect.before(this.searchDijit, 'select', lang.hitch(this, '_captureSelect'))
                 );
+              */
+
               this.own(
                 on(this.searchDijit, 'search-results', lang.hitch(this, '_onSearchResults'))
               );
@@ -268,7 +272,8 @@ define([
               maxSuggestions: source.maxSuggestions,
               maxResults: source.maxResults || 6,
               zoomScale: source.zoomScale || 50000,
-              useMapExtent: !!source.searchInCurrentMapExtent
+              useMapExtent: !!source.searchInCurrentMapExtent,
+              _zoomScaleOfConfigSource: source.zoomScale
             };
 
             if (source.enableLocalSearch) {
@@ -276,6 +281,10 @@ define([
                 minScale: source.localSearchMinScale,
                 distance: source.localSearchDistance
               };
+            }
+
+            if (source.zoomScale) {
+              _source.autoNavigate = false;
             }
 
             def.resolve(_source);
@@ -336,7 +345,8 @@ define([
                 useMapExtent: !!source.searchInCurrentMapExtent,
                 showInfoWindowOnSelect: showInfoWindowOnSelect,
                 enableInfoWindow: enableInfoWindow,
-                _featureLayerId: source.layerId
+                _featureLayerId: source.layerId,
+                _zoomScaleOfConfigSource: source.zoomScale
               };
               /*
               if (!template) {
@@ -382,11 +392,28 @@ define([
         if (layerInfo) {
           def = layerInfo.loadInfoTemplate();
         } else { // (added by user in setting) or (only configured fieldInfo)
+          /*
           template = new InfoTemplate();
           template.setTitle('&nbsp;');
           template.setContent(
             lang.hitch(this, '_formatContent', source.name, fLayer, source.displayField)
           );
+          def.resolve(template);
+          */
+
+          var fieldNames = [];
+          array.filter(fLayer.fields, function(field) {
+            if(field.name.toLowerCase() !== "shape") {
+              fieldNames.push(field.name);
+            }
+          });
+
+          //var displayValue = graphic.attributes[source.displayField];
+          var title =  source.name + ": {" + source.displayField + "}";
+          var popupInfo = jimuUtils.getDefaultPopupInfo(fLayer, title, fieldNames);
+          if(popupInfo) {
+            template = new PopupTemplate(popupInfo);
+          }
           def.resolve(template);
         }
         return def;
@@ -425,6 +452,7 @@ define([
         return null;
       },
 
+      // this funciton is deprecated.
       _captureSelect: function(e) {
         var sourceIndex = this.searchDijit.activeSourceIndex;
         if (sourceIndex === 'all') {
@@ -433,6 +461,7 @@ define([
         if (isFinite(sourceIndex) && esriLang.isDefined(sourceIndex)) {
           var source = this.searchDijit.sources[sourceIndex];
           if (source && 'featureLayer' in source) {
+
             var popupInfo = this._getSourcePopupInfo(source);
             var notFormatted = (popupInfo && popupInfo.showAttachments) ||
               (popupInfo && popupInfo.description &&
@@ -511,6 +540,7 @@ define([
         return content;
       },
 
+      // this funciton is deprecated.
       _getFormatedAttrs: function(attrs, fields, typeIdField, types, popupInfo) {
         function getFormatInfo(fieldName) {
           if (popupInfo && esriLang.isDefined(popupInfo.fieldInfos)) {
@@ -717,30 +747,47 @@ define([
         }
       },
 
+
+      _zoomToScale: function(zoomScale, features) {
+        this.map.setScale(zoomScale);
+        jimuUtils.featureAction.panTo(this.map, features);
+      },
+
       _showPopupByFeatures: function(layerInfo, features, selectEvent) {
+        /*jshint unused: false*/
         var location = null;
         var isPoint = false;
-        //this.map.infoWindow.clearFeatures();
-        //this.map.infoWindow.hide();
-        this.map.infoWindow.setFeatures(features);
-        if (features[0].geometry.type === "point") {
-          location = features[0].geometry;
-          isPoint = true;
+
+        if(this.config.showInfoWindowOnSelect) {
+          //this.map.infoWindow.clearFeatures();
+          //this.map.infoWindow.hide();
+          this.map.infoWindow.setFeatures(features);
+          if (features[0].geometry.type === "point") {
+            location = features[0].geometry;
+            isPoint = true;
+          } else {
+            var extent = features[0].geometry && features[0].geometry.getExtent();
+            location = extent && extent.getCenter();
+          }
+          if(location) {
+            this.map.infoWindow.show(location, {
+              closetFirst: true
+            });
+          }
         } else {
-          location = features[0].geometry.getExtent().getCenter();
+          // hightlight result
+          this.map.infoWindow.setFeatures(features);
+          this.map.infoWindow.updateHighlight(this.map, features[0]);
+          this.map.infoWindow.showHighlight();
         }
-        this.map.infoWindow.show(location, {
-          closetFirst: true
-        });
+
         // zoomto result
-        if(isPoint) {
-          // must use result.extent to respect scale setting in the setting page.
-          jimuUtils.zoomToExtent(this.map, selectEvent.result.extent, layerInfo.id);
+        if(selectEvent.source._zoomScaleOfConfigSource) {
+          this._zoomToScale(selectEvent.source.zoomScale, features);
         } else {
           var featureSet = jimuUtils.toFeatureSet(features);
           jimuUtils.zoomToFeatureSet(this.map, featureSet);
         }
-        //this.map.setExtent(selectEvent.result.extent);
       },
 
       _loadInfoTemplateAndShowPopup: function(layerInfo, selectedFeature, selectEvent) {
@@ -805,9 +852,9 @@ define([
         //var layer = this.map.getLayer(sourceLayerId);
         var layerInfo = this.layerInfosObj.getLayerInfoById(sourceLayerId);
 
-        if (layerInfo  && this.config.showInfoWindowOnSelect) {
+        if (layerInfo) {
           layerInfo.getLayerObject().then(lang.hitch(this, function(layer) {
-            var gs = getGraphics(layer, resultFeature.__attributes[layer.objectIdField]);
+            var gs = getGraphics(layer, resultFeature.attributes[layer.objectIdField]);
             if (gs && gs.length > 0) {
               //this._showPopupByFeatures(gs);
               this._loadInfoTemplateAndShowPopup(layerInfo, gs[0], e);
@@ -815,7 +862,7 @@ define([
               /*
               var handle = on(layer, 'update-end', lang.hitch(this, function() {
                 if (this.domNode) {
-                  var gs = getGraphics(layer, resultFeature.__attributes[layer.objectIdField]);
+                  var gs = getGraphics(layer, resultFeature.attributes[layer.objectIdField]);
                   if (gs.length > 0) {
                     this._showPopupByFeatures(gs);
                   }
@@ -830,7 +877,7 @@ define([
 
               var featureQuery = new FeatureQuery();
               featureQuery.where = layer.objectIdField + " = " +
-                                 resultFeature.__attributes[layer.objectIdField];
+                                 resultFeature.attributes[layer.objectIdField];
               featureQuery.outSpatialReference = this.map.spatialReference;
 
               layer.selectFeatures(featureQuery,
@@ -854,9 +901,17 @@ define([
         } else if (e.source.featureLayer && !e.source.locator){
           // outside resource result:
           // zoomTo by zoomToExtent, popup by search dijit
-          jimuUtils.zoomToExtent(this.map, e.result.extent);
+          if(e.source._zoomScaleOfConfigSource) {
+            this._zoomToScale(e.source._zoomScaleOfConfigSource, [e.result.feature]);
+          } else {
+            jimuUtils.zoomToExtent(this.map, e.result.extent);
+          }
+        } else {
+          if(e.source._zoomScaleOfConfigSource) {
+            this._zoomToScale(e.source._zoomScaleOfConfigSource, [e.result.feature]);
+          }
+          //result of geocoder service will be popuped and zoomto by search dijit;
         }
-        //result of geocoder service will be popuped and zoomto by search dijit;
 
         // publish select result to other widgets
         this.publishData({
@@ -868,6 +923,7 @@ define([
         html.setStyle(this.searchResultsNode, 'display', 'none');
         this.searchResultsNode.innerHTML = "";
         this.searchResults = null;
+        //this.map.infoWindow.hideHighlight();
       },
 
       _hideResultMenu: function() {

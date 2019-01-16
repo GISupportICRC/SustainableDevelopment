@@ -78,6 +78,7 @@ function(on, Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateM
     noFilterTip: '',//optional
     enableAskForValues: false,//optional
     mobileBreakWidth: 600,
+    runtime: false, //optional
 
     //public methods:
     //build: partsObj or expr -> UI
@@ -216,13 +217,7 @@ function(on, Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateM
         this.isHosted = jimuUtils.isHostedService(this.url);
         this._layerDefinition = options.layerDefinition;
         this.featureLayerId = options.featureLayerId;
-        if(this.featureLayerId){
-          var _layerInfo = this.layerInfosObj.getLayerOrTableInfoById(this.featureLayerId);
-          var _popup = _layerInfo.getPopupInfo(); //return undefined if weblayer didn't enable popup Configure
-          if(_popup){
-            this._popupFieldsInfo = _popup.fieldInfos;
-          }
-        }
+
         if(options.partsObj){
           this.partsObj = this._updatePartsObj(options.partsObj);
           this._def = this._init("partsObj");
@@ -341,13 +336,26 @@ function(on, Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateM
       var callback = lang.hitch(this, function() {
         html.addClass(this.errorSection, 'hidden');
         this.removeAllFilters();
+
+        var _popup;
         if(this.featureLayerId){
           this._tryOverrideFieldAliases(this.featureLayerId, this._layerDefinition);
+          var _layerInfo = this.layerInfosObj.getLayerOrTableInfoById(this.featureLayerId);
+          _popup = _layerInfo.getPopupInfo();
         }
         var fields = this._layerDefinition.fields;
         if (!(fields && fields.length > 0)) {
+          if(_popup){
+            this._popupFieldsInfo = _popup.fieldInfos;
+          }
           def.reject();
           return;
+        }else{
+          if(_popup){//complete popupFields with layerFields
+            this._popupFieldsInfo = jimuUtils.completePopupFieldFromLayerField(fields, _popup.fieldInfos);
+          }else{ //use default setting if no popupInfo
+            this._popupFieldsInfo = fields;
+          }
         }
 
         fields = array.filter(fields, lang.hitch(this, function(fieldInfo) {
@@ -607,7 +615,8 @@ function(on, Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateM
         OPERATORS: lang.mixin({}, this.OPERATORS),
         enableAskForValues: this.enableAskForValues,
         isHosted: this.isHosted,
-        valueProviderFactory: this.valueProviderFactory
+        valueProviderFactory: this.valueProviderFactory,
+        runtime: this.runtime
       };
       var singleFilter = new SingleFilter(args);
       singleFilter.placeAt(this.allExpsBox);
@@ -635,7 +644,8 @@ function(on, Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateM
         OPERATORS: lang.mixin({}, this.OPERATORS),
         enableAskForValues: this.enableAskForValues,
         isHosted: this.isHosted,
-        valueProviderFactory: this.valueProviderFactory
+        valueProviderFactory: this.valueProviderFactory,
+        runtime: this.runtime
       };
       var filterSet = new FilterSet(args);
       filterSet.placeAt(this.allExpsBox);

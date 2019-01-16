@@ -29,7 +29,7 @@ define([
     'libs/echarts/dark'
   ],
   function(declare, _WidgetBase, lang, html, Evented, echarts,
-    jimuUtils, chartUtils, Gauge, ChartOptionFactory) {
+    jimuUtils, ChartUtils, Gauge, ChartOptionFactory) {
 
     return declare([_WidgetBase, Evented], {
       'baseClass': 'jimu-dijit-chart',
@@ -44,11 +44,12 @@ define([
       //resize -> Resizes chart, which should be called manually when container size changes.
 
       //config params:
-      // "type": "bar", //"column", "line", "pie", "radar", "funnel", "gauge"
-      // "title": "string",
-      // "legend": "boolean",
-      // "hidexAxis":"boolean",
-      // "hideyAxis":"boolean",
+      // "type":"bar", //"column", "line", "pie", "radar", "funnel", "gauge"
+      // "title":"string",
+      // "legend":{show:true,textStyle:{}},
+      // "xAxis":{name:'',show:true,textStyle:{},nameTextStyle:{}},
+      // "yAxis":{name:'',show:true,nameTextStyle:{}},
+      // "dataLabel":{show:true,textStyle:{}},
       // "confine":boolean,//Whether the tooltip is limited to canvas tag
       // "theme":"",//A registered theme name, light or dark
       // "toolbox": ["saveAsImage", "restore", "dataView", "magicType"],
@@ -102,132 +103,153 @@ define([
       //   "showTargetValueLabel":boolean,
       // },
       // /**advance option*/
-      // "advanceOption": {}
-      config: null,
+      // "advanceOption": {},
+      // markLine:{
+      //   data: [{
+      //     "name": "",
+      //     "label": {
+      //       "show": "boolean",
+      //       "position": "", //start, middle, end
+      //       "color": "",
+      //       "fontSize": 12
+      //     },
+      //     "lineStyle": {
+      //        "color": "",
+      //        "width": 12,
+      //        "type": "solid", //dashed, dotted
+      //     },
+      //     "x/yAxis": 1,
+      //  }]
+      //}
+      // markArea:[{
+      //   "data": [{
+      //      "name": "",
+      //      "x/yAxis": 1,
+      //      "label": {
+      //        "show": "boolean",
+      //        "position": "", //"top", "left","right","bottom",
+      //                        "inside","insideLeft","insideRight","insideTop",
+      //                        "insideBottom","insideTopLeft","insideBottomLeft",
+      //                        "insideTopRight","insideBottomRight",
+      //        "color": "",
+      //        "fontSize": 12
+      //      },
+      //      "itemStyle": {
+      //         "color": "",
+      //         "opacity": 1
+      //      },
+      //      }, {
+      //        "x/yAxis": 1,
+      //      }]
+      // }]
 
-      validConfig: {
-        type: ['column', 'bar', 'line', 'pie', 'radar', 'funnel', 'gauge'],
-        common: ['type', 'title', 'labels', 'legend', 'confine', 'toolbox', 'color', 'theme',
-          'backgroundColor', 'scale', 'dataZoom',
-          'events', 'series', 'advanceOption'
-        ],
-        axisChart: ['stack', 'axisPointer', 'hidexAxis', 'hideyAxis', 'area'],
-        pie: ['labelLine', 'pieMode', 'roseType', 'innerRadius'],
-        funnel: ['min', 'max', 'funnelSort'],
-        gauge: ['shape', 'min', 'max', 'gaugeOption'],
-        radar: ['radarShape', 'indicator']
-      },
+      config: null,
 
       postCreate: function() {
         this.inherited(arguments);
-        //init chart domNode box
-        var box = this._getChartBox(this.chartDom);
-        html.setStyle(this.domNode, {
-          width: box.w + 'px',
-          height: box.h + 'px'
-        });
-
-        //init chart, gauge and chart option factory
-        this.chart = echarts.init(this.domNode, this.config.theme || 'light');
-        this.gauge = new Gauge({
-          chart: this.chart
-        });
-
-        this.chartOptionFactory = new ChartOptionFactory({
-          chart: this.chart,
-          gauge: this.gauge
-        });
-
-        this.setConfig();
+        this._initChart();
       },
 
       updateConfig: function(config) {
-
         if (!config) {
           return false;
         }
-
-        this.config = lang.mixin(this.config, config);
-        var option = this._chartFactory(this.config);
+        this.config = config;
+        this._specialThemeByConfig(config);
+        var option = this._chartFactory(config);
         this.chart.setOption(option, true);
-        if (this.config.type === 'gauge' && this.config.shape !== 'curved') {
-          this.gauge._resetGraphic(this.config);
-        }
+
+        this._settingByGrid(config, option);
 
         return true;
       },
 
-      setConfig: function(config) {
-
-        if (!config) {
-          this.config = this.config || {};
-        } else {
-          this.config = config;
+      _settingByGrid: function(config, option) {
+        if (config.type === 'gauge') {
+          return this._resetGaugePosition(config);
         }
+        var position = this.chartUtils.getAxisZeroPosition();
+        config.layout = this.chartUtils.calcDefaultLayout(config);
+        if (this.chartUtils.isAxisChart(config)) {
+          option = this.chartUtils.settingGrid(option, config);
+          option = this.chartUtils.settingDataZoom(option, config, position);
+        }
+        option = this.chartUtils.settingChartLayout(option, config);
+        this.chart.setOption(option, false);
+      },
 
-        if (!this._checkConfig(this.config)) {
+      _resetGaugePosition: function(config) {
+        this._resetGaugeGrid(config);
+        this._resetGaugeGraphic(config);
+      },
+
+      setConfig: function(config) {
+        if (!config) {
           return false;
         }
-        this._customTheme();
-        this.clear();
-        this.chart.setOption(this._chartFactory(this.config));
 
-        this._resizeGridAndGraphicOfGauge();
+        this.config = config;
+
+        this._specialThemeByConfig(this.config);
+        this.clear();
+        var option = this._chartFactory(this.config);
+        this.chart.setOption(option, true);
+
+        this._setAixsGrid(config, option);
+        this._resetGaugePosition(config, option);
+
         return true;
       },
 
       destroy: function() {
+        this._offEvents();
+        this.clear();
+        this.inherited(arguments);
+      },
+
+      _chartFactory: function(config) {
+        this.option = this.chartOptionFactory.produceOption(config);
+        return this.option;
+      },
+
+      bindEvents: function(config) {
+        if (!this.chart || !config.events || !config.events.length) {
+          return;
+        }
+        this._offEvents();
+        config.events.forEach(lang.hitch(this, function(event) {
+          this.chart.on(event.name, event.callback);
+        }));
+
+      },
+
+      _offEvents: function() {
         if (this.config.events && this.config.events[0]) {
           this.config.events.forEach(lang.hitch(this, function(event) {
             this.chart.off(event.name);
           }));
         }
-        this.chart.clear();
-        this.inherited(arguments);
       },
 
-      _showInitChart: function(config) {
-        var chartType;
-        if (config.type === 'column' || config.shape === 'horizontal' ||
-          config.shape === 'vertical') {
-          chartType = 'bar';
-        } else {
-          chartType = config.type;
+      getDataURL: function() {
+        if (!this.chart) {
+          return;
         }
-        var option = {
-          series: [{
-            data: [{
-              name: '0',
-              value: 0
-            }]
-          }]
-        };
-        if (chartUtils.isAxisChart(config)) {
-          option.xAxis = {
-            data: ["0"]
-          };
-          option.yAxis = {};
-        }
-        option.series[0].type = chartType;
-        this.chart.setOption(option, false);
-      },
-
-      _chartFactory: function(config) {
-
-        //show init chart for calcute
-        if (!config.shape) {
-          this._showInitChart(config);
-        }
-        this.option = this.chartOptionFactory.produceOption(config);
-        this._bindEvents(config);
-        return this.option;
+        return this.chart.getDataURL();
       },
 
       clear: function() {
+        if (!this.chart) {
+          return;
+        }
         this.chart.clear();
       },
 
       resize: function(width, height) {
+        if (!this.chart) {
+          return;
+        }
+
         html.setStyle(this.domNode, {
           width: width || '100%',
           height: height || '100%'
@@ -235,66 +257,44 @@ define([
         this.chart.resize();
         //data zoom
         this._resizeDataZoom();
-        this._resizeGridAndGraphicOfGauge();
-      },
-
-      _getChartBox: function() {
-        var box = {
-          w: 10,
-          h: 10
-        };
-
-        if (this.chartDom) {
-          var chartBox = html.getMarginBox(this.chartDom);
-          if (chartBox.w !== 0) {
-            box.w = chartBox.w;
-          }
-          if (chartBox.h !== 0) {
-            box.h = chartBox.h;
-          }
-        }
-        return box;
+        this._resetGaugePosition(this.config);
       },
 
       _resizeDataZoom: function() {
         var option = this.option;
         var config = this.config;
-        option = this.chartOptionFactory.settingDataZoom(option, config);
+        if (!option || !config) {
+          return;
+        }
+        var position = this.chartUtils.getAxisZeroPosition();
+        option = this.chartUtils.settingDataZoom(option, config, position);
         this.chart.setOption(option);
       },
 
-      _bindEvents: function(config) {
-        if (config.events && config.events[0]) {
-          config.events.forEach(lang.hitch(this, function(event) {
-            this.chart.on(event.name, event.callback);
-          }));
+      _setAixsGrid: function(config, option) {
+        if (this.chartUtils.isAxisChart(config)) {
+          option = this.chartUtils.settingGrid(option, config);
+          this.chart.setOption(option, false);
         }
       },
 
-      _resizeGridAndGraphicOfGauge: function() {
-        if (this.config.type === 'gauge' && this.config.shape !== 'curved') {
-          this.gauge._resetGrid(this.config);
-          this.gauge._resetGraphic(this.config);
+      _resetGaugeGraphic: function(config) {
+        if (config.type === 'gauge') {
+          this.gauge.resetGraphic(config);
         }
       },
 
-      _customTheme: function() {
-        if (!this.chart._theme) {
-          this.chart._theme = {};
+      _resetGaugeGrid: function(config) {
+        if (config.type === 'gauge') {
+          this.gauge.resetGrid(config);
         }
-        //color
-        // if (this.config.color && this.config.color[0]) {
-        //   this.chart._theme.color = this.config.color;
-        // }
-        //tooltip
-        if (!this.chart._theme.tooltip) {
-          this.chart._theme.tooltip = {};
+      },
+
+      _specialChartTheme: function() {
+        if (!this.chart) {
+          return;
         }
-        //tooltip
-        if (this.config.confine) {
-          this.chart._theme.tooltip.confine = true;
-        }
-        //tooltip 1.axisPointer
+        //_theme.axisPointer
         this.chart._theme.tooltip.axisPointer = {
           type: 'cross',
           label: {
@@ -303,11 +303,11 @@ define([
             formatter: function(params) {
               if (typeof params.value === 'number') {
                 var value = parseFloat(params.value).toFixed(2);
-                return chartUtils.tryLocaleNumber(value);
+                return this.chartUtils.tryLocaleNumber(value);
               } else {
                 return params.value;
               }
-            }
+            }.bind(this)
           },
           lineStyle: {
             color: '#27727B',
@@ -320,7 +320,7 @@ define([
             color: 'rgba(200,200,200,0.3)'
           }
         };
-        //value axis
+        //value axis formatter
         if (!this.chart._theme.valueAxis) {
           this.chart._theme.valueAxis = {};
         }
@@ -332,32 +332,61 @@ define([
         };
       },
 
-      _checkConfig: function(config) {
-        var isValidConfig = true;
-        if (!config) {
-          console.error('Empty config');
-          isValidConfig = false;
+      _specialThemeByConfig: function(config) {
+        this._initChartTheme();
+        //mixin color to _theme
+        if (config.color && config.color[0]) {
+          this.chart._theme.color = config.color;
         }
-        if (!config.type || this.validConfig.type.indexOf(config.type) < 0) {
-          console.error('Invaild chart type!');
-          isValidConfig = false;
+        if (config.confine) {
+          this.chart._theme.tooltip.confine = true;
         }
-        var validConfig = lang.clone(this.validConfig);
-        var commonConfig = validConfig.common;
-        var validOption = [];
-        if (config.type === 'column' || config.type === 'bar' || config.type === 'line') {
-          validOption = commonConfig.concat(validConfig.axisChart);
-        } else {
-          validOption = commonConfig.concat(validConfig[config.type]);
+
+        var isPercent = config.stack === 'percent';
+
+        this.chart._theme.tooltip.formatter = function(params) {
+          return this.chartUtils.handleToolTip(params, null, false, isPercent);
+        }.bind(this);
+      },
+
+      _initChartTheme: function() {
+        if (!this.chart) {
+          return;
         }
-        var keys = Object.keys(config);
-        keys.forEach(function(key) {
-          if (validOption.indexOf(key) < 0) {
-            isValidConfig = false;
-            console.error('Invalid configuration parameter: ' + key);
-          }
+        if (!this.chart._theme) {
+          this.chart._theme = {};
+        }
+        if (!this.chart._theme.tooltip) {
+          this.chart._theme.tooltip = {};
+        }
+        if (!this.chart._theme.valueAxis) {
+          this.chart._theme.valueAxis = {};
+        }
+        if (!this.chart._theme.valueAxis.axisLabel) {
+          this.chart._theme.valueAxis.axisLabel = {};
+        }
+      },
+
+      _initChart: function() {
+        var theme = this.config && this.config.theme;
+        theme = theme || 'light';
+        this.chart = echarts.init(this.domNode, theme);
+
+        this.chartUtils = new ChartUtils({
+          chart: this.chart
         });
-        return isValidConfig;
+
+        this.gauge = new Gauge({
+          chart: this.chart,
+          chartUtils: this.chartUtils
+        });
+
+        this.chartOptionFactory = new ChartOptionFactory({
+          chart: this.chart,
+          gauge: this.gauge,
+          chartUtils: this.chartUtils
+        });
+        this._specialChartTheme(this.config);
       }
 
     });

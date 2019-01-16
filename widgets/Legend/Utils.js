@@ -88,6 +88,23 @@ define([
     return layerInfosParam.reverse();
   };
 
+  mo.isSupportedLayerType = function(layer) {
+    if (layer &&
+        (layer.declaredClass === "esri.layers.ArcGISDynamicMapServiceLayer" ||
+        (layer.declaredClass === "esri.layers.ArcGISImageServiceLayer" && layer.version >= 10.2) ||
+        layer.declaredClass === "esri.layers.ArcGISImageServiceVectorLayer" ||
+        layer.declaredClass === "esri.layers.ArcGISTiledMapServiceLayer" ||
+        layer.declaredClass === "esri.layers.FeatureLayer" ||
+        layer.declaredClass === "esri.layers.StreamLayer" ||
+        layer.declaredClass === "esri.layers.KMLLayer" ||
+        layer.declaredClass === "esri.layers.GeoRSSLayer" ||
+        layer.declaredClass === "esri.layers.WMSLayer" ||
+        layer.declaredClass === "esri.layers.WFSLayer" ||
+        layer.declaredClass === "esri.layers.CSVLayer")) {
+      return true;
+    }
+    return false;
+  };
   /*
   function isShowLegend(layerInfo, config) {
     var isToggledOnLegend;

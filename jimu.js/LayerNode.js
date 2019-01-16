@@ -597,6 +597,9 @@ define([
           case 'opacityChanged':
             newEventName = clazz.EVENT_OPACITY_CHANGE;
             break;
+          case 'timeExtentChanged':
+            newEventName = clazz.EVENT_TIME_EXTENT_CHANGE;
+            break;
         }
         //this.emit.apply(this, newArguments);
         if(newEventName) {
@@ -626,7 +629,8 @@ define([
     EVENT_VISIBILITY_CHANGE: "visibility-change",
     EVENT_FILTER_CHANGE: "filter-change",
     EVENT_RENDERER_CHANGE: "renderer-change",
-    EVENT_OPACITY_CHANGE: "opacity-change"
+    EVENT_OPACITY_CHANGE: "opacity-change",
+    EVENT_TIME_EXTENT_CHANGE: "time-extent-change"
   });
   return clazz;
 });

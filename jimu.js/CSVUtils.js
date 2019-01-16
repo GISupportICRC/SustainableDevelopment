@@ -69,6 +69,10 @@ define([
           formatNumber: options.formatNumber,
           formatDate: options.formatDate,
           formatCodedValue: options.formatCodedValue,
+          richText: {
+            clearFormat: options.richTextFieldsToClear && !!options.richTextFieldsToClear.length,
+            fieldsToClear: options.richTextFieldsToClear || []
+          },
           popupInfo: options.popupInfo
         };
         return exports._formattedData(layer, result, formattedOptions)
@@ -405,10 +409,23 @@ define([
 
         return null;
       }
+      var fieldsToClear = formattedOptions.richText.fieldsToClear;
+      function isRichTextField(fieldName) {
+        for (var i = 0, len = fieldsToClear.length; i < len; i++) {
+          var f = fieldsToClear[i];
+          if (f.fieldName === fieldName) {
+            return true;
+          }
+        }
+        return false;
+      }
       var isDomain = !!field.domain && formattedOptions.formatCodedValue;
       var isDate = field.type === "esriFieldTypeDate" && formattedOptions.formatDate;
       var isOjbectIdField = pk && (field.name === pk);
       var isTypeIdField = typeIdField && (field.name === typeIdField);
+      var isRichTextField = field.type === "esriFieldTypeString" &&
+                            formattedOptions.richText.clearFormat &&
+                            isRichTextField(field.name);
 
       if (isDate) {
         return jimuUtils.fieldFormatter.getFormattedDate(data, getFormatInfo(field.name));
@@ -419,7 +436,16 @@ define([
       if (isDomain) {
         return jimuUtils.fieldFormatter.getCodedValue(field.domain, data);
       }
-      if (!isDomain && !isDate && !isOjbectIdField && !isTypeIdField) {
+      if (isRichTextField) {
+        if(data) {
+          var d = document.createElement('span');
+          d.innerHTML = data;
+          return d.textContent || d.innerText || '';
+        } else {
+          return data;
+        }
+      }
+      if (!isDomain && !isDate && !isOjbectIdField && !isTypeIdField && !isRichTextField) {
         var codeValue = null;
         if (pk && types && types.length > 0) {
           var typeChecks = array.filter(types, function(item) {

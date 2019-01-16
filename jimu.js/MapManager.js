@@ -143,7 +143,6 @@ define([
           this.map.setInfoWindow(this._mapInfoWindow);
           this.isMobileInfoWindow = false;
         }
-        this.map.infoWindow.resize(504, 392); 
       },
 
       onSyncExtent: function(map){

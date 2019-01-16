@@ -56,6 +56,8 @@ define([
       maxSize: 1024,
       format: null, // array:['image/png','image/gif','image/jpeg']
 
+      customZIndex: null, //optional
+
       // public methods
       //enableChooseImage
       //disableChooseImage
@@ -160,6 +162,14 @@ define([
         }
       },
 
+      _newMessage: function(msg){
+        this.msgPopupOpen = true;
+        this.msgPopup = new Message({
+          customZIndex: this.customZIndex,
+          message: msg
+        });
+      },
+
       _porcessMaskClick: function() {
         html.setAttr(this.fileInput, 'id', 'imageChooser_' + count);
         html.setAttr(this.mask, 'for', 'imageChooser_' + count);
@@ -167,9 +177,7 @@ define([
         on.once(this.mask, 'click', lang.hitch(this, function(evt) {
           evt.stopPropagation();
           if (has('safari') && has('safari') < 7) {
-            new Message({
-              message: this.nls.unsupportReaderAPI
-            });
+            this._newMessage(this.nls.unsupportReaderAPI);
             evt.preventDefault();
             return;
           }
@@ -180,17 +188,12 @@ define([
                 innerHTML: this.nls.enableFlash,
                 target: '_blank'
               });
-
-              new Message({
-                message: errContent
-              });
+              this._newMessage(errContent);
               evt.preventDefault();
               return;
             }
             if (!utils.file.supportFileAPI()) {
-              new Message({
-                message: this.nls.unsupportReaderAPI
-              });
+              this._newMessage(this.nls.unsupportReaderAPI);
               evt.preventDefault();
               return;
             }
@@ -227,9 +230,7 @@ define([
       _onFileInputChange: function (evt) {
         var file = (evt.target.files && evt.target.files[0]) || (evt.files && evt.files[0]);
         if (this.format && this.format.indexOf(file.type) === -1) {
-          new Message({
-            'message': this.nls.invalidType
-          });
+          this._newMessage(this.nls.invalidType);
 
           this._initFileForm();//recreate fileForm to support select same image again.
           return;
@@ -243,9 +244,7 @@ define([
             if (err.errCode === 'exceed') {
               message = message.replace('1024', maxSize / 1024);
             }
-            new Message({
-              'message': message
-            });
+            this._newMessage(message);
           } else {
             this.fileProperty.fileName = fileName;
             if (this.cropImage && file.type !== 'image/gif') {
@@ -322,9 +321,11 @@ define([
         var shelter = new LoadingShelter({
           hidden: true
         });
-        var cropPopup = new Popup({
+        this.cropPopupOpen = true;
+        this.cropPopup = new Popup({
           titleLabel: this.nls.cropImage,
           content: cropImage,
+          customZIndex: this.customZIndex,
           // autoHeight: true,
           width: 500,
           height: 480,
@@ -335,17 +336,17 @@ define([
 
               var fileData = cropImage.getData();
               this._readFileData(fileData);
-              cropPopup.close();
+              this.cropPopup.close();
 
               cropImage.destroy();
               shelter.hide();
             })
           }]
         });
-        shelter.placeAt(cropPopup.domNode);
+        shelter.placeAt(this.cropPopup.domNode);
         cropImage.startup();
 
-        html.addClass(cropPopup.domNode, 'image-chooser-crop-popup');
+        html.addClass(this.cropPopup.domNode, 'image-chooser-crop-popup');
       },
 
       onImageChange: function(fileData) {

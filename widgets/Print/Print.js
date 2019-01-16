@@ -554,6 +554,7 @@ define([
       if (this.printSettingsFormDijit.isValid()) {
         var form = this.printSettingsFormDijit.get('value');
         lang.mixin(form, this.layoutMetadataDijit.get('value'));
+        lang.mixin(form, this.forceAttributesFormDijit.get('value'));
         lang.mixin(form, this.labelsFormDijit.get('value'));
         this.preserve = this.preserveFormDijit.get('value');
         lang.mixin(form, this.preserve);
@@ -586,6 +587,7 @@ define([
         template.format = form.format;
         template.layout = form.layout;
         template.preserveScale = (form.preserveScale === 'true' || form.preserveScale === 'force');
+        template.forceFeatureAttributes = form.forceFeatureAttributes && form.forceFeatureAttributes[0];
         template.label = form.title;
         template.exportOptions = mapOnlyForm;
         template.showLabels = form.showLabels && form.showLabels[0];

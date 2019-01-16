@@ -5,6 +5,12 @@ define({
   "actions": "配置图层字段",
   "field": "字段",
   "alias": "别名",
+  "url": "URL",
+  "sortField": "排序字段",
+  "sortOrderTooltips": {
+    "toDescending": "更改为降序",
+    "toAscending": "更改为升序"
+  },
   "visible": "可见",
   "linkField": "链接字段",
   "noLayers": "没有可用的要素图层",

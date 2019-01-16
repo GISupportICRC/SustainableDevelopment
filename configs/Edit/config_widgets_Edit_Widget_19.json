@@ -1,0 +1,149 @@
+{
+  "editor": {
+    "enableUndoRedo": true,
+    "toolbarVisible": true,
+    "toolbarOptions": {
+      "mergeVisible": false,
+      "cutVisible": false,
+      "reshapeVisible": false
+    },
+    "layerInfos": [
+      {
+        "featureLayer": {
+          "id": "service_f3486ce309004fc2974539e0f266f5f2_9650_6848"
+        },
+        "disableGeometryUpdate": false,
+        "allowCreate": false,
+        "allowDelete": true,
+        "fieldInfos": [
+          {
+            "fieldName": "objectid",
+            "label": "ObjectID",
+            "isEditable": null,
+            "visible": false
+          },
+          {
+            "fieldName": "globalid",
+            "label": "GlobalID",
+            "isEditable": null,
+            "visible": false
+          },
+          {
+            "fieldName": "country",
+            "label": "Country",
+            "isEditable": false,
+            "visible": true
+          },
+          {
+            "fieldName": "region",
+            "label": "Region",
+            "isEditable": false,
+            "visible": true
+          },
+          {
+            "fieldName": "title",
+            "label": "Project title",
+            "isEditable": false,
+            "visible": true
+          },
+          {
+            "fieldName": "start_date",
+            "label": "Project timeline START",
+            "isEditable": true,
+            "visible": true
+          },
+          {
+            "fieldName": "end_date",
+            "label": "Project timeline END",
+            "isEditable": true,
+            "visible": true
+          },
+          {
+            "fieldName": "theme",
+            "label": "Theme",
+            "isEditable": false,
+            "visible": true
+          },
+          {
+            "fieldName": "organisation",
+            "label": "Organisation(s)",
+            "isEditable": false,
+            "visible": true
+          },
+          {
+            "fieldName": "description",
+            "label": "Project description",
+            "isEditable": false,
+            "visible": true
+          },
+          {
+            "fieldName": "name",
+            "label": "name",
+            "isEditable": false,
+            "visible": true
+          },
+          {
+            "fieldName": "email",
+            "label": "Contact email (optional)",
+            "isEditable": false,
+            "visible": true
+          },
+          {
+            "fieldName": "project_link",
+            "label": "Link to the project",
+            "isEditable": false,
+            "visible": true
+          },
+          {
+            "fieldName": "checks",
+            "label": "Consent",
+            "isEditable": false,
+            "visible": true
+          },
+          {
+            "fieldName": "popUpImage",
+            "label": ".",
+            "isEditable": false,
+            "visible": false
+          },
+          {
+            "fieldName": "CreationDate",
+            "label": "CreationDate",
+            "isEditable": null,
+            "visible": true
+          },
+          {
+            "fieldName": "Creator",
+            "label": "Creator",
+            "isEditable": null,
+            "visible": true
+          },
+          {
+            "fieldName": "EditDate",
+            "label": "EditDate",
+            "isEditable": null,
+            "visible": true
+          },
+          {
+            "fieldName": "Editor",
+            "label": "Editor",
+            "isEditable": null,
+            "visible": true
+          },
+          {
+            "fieldName": "dataStatus",
+            "label": "dataStatus",
+            "isEditable": true,
+            "visible": true
+          }
+        ]
+      }
+    ],
+    "useFilterEdit": true,
+    "autoApplyEditWhenGeometryIsMoved": false,
+    "snappingTolerance": 15,
+    "popupTolerance": 5,
+    "stickyMoveTolerance": 0,
+    "usingSaveButton": true
+  }
+}

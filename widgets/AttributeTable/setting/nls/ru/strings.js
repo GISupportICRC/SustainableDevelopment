@@ -5,6 +5,12 @@ define({
   "actions": "Настройка полей слоя",
   "field": "Поле",
   "alias": "Псевдоним",
+  "url": "URL-адрес",
+  "sortField": "Поле сортировки",
+  "sortOrderTooltips": {
+    "toDescending": "Изменить на порядок по убыванию",
+    "toAscending": "Изменить на порядок по возрастанию"
+  },
   "visible": "Видимый",
   "linkField": "Поле ссылки",
   "noLayers": "Нет доступных слоев объектов",

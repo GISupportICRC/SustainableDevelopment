@@ -5,6 +5,12 @@ define({
   "actions": "Laagvelden configureren",
   "field": "Veld",
   "alias": "Alias",
+  "url": "URL",
+  "sortField": "Veld sorteren",
+  "sortOrderTooltips": {
+    "toDescending": "Verander naar aflopende volgorde",
+    "toAscending": "Verander naar oplopende volgorde"
+  },
   "visible": "Zichtbaar",
   "linkField": "Linkveld",
   "noLayers": "Er zijn geen objectlagen beschikbaar",

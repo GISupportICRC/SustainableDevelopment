@@ -34,5 +34,7 @@ define({
   "print": "Tulosta",
   "clearList": "Tyhjennä tulosteet",
   "creatingPrint": "Luodaan tulostetta",
-  "printError": "Virhe, yritä uudelleen"
+  "printError": "Virhe, yritä uudelleen",
+  "forceFeatureAttributes": "Kohteen ominaisuustiedot",
+  "includeFeatureAttributes": "Sisällytä ominaisuustiedot"
 });

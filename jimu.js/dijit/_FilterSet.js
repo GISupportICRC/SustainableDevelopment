@@ -48,6 +48,7 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
     enableAskForValues: false,
     isHosted: false,
     valueProviderFactory: null,
+    runtime: false, //optional
 
     //public methods:
     //toJson
@@ -137,7 +138,8 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
         enableAskForValues: this.enableAskForValues,
         isHosted: this.isHosted,
         valueProviderFactory: this.valueProviderFactory,
-        isInFilterSet: true
+        isInFilterSet: true,
+        runtime: this.runtime
       };
       var singleFilter = new SingleFilter(args);
       singleFilter.placeAt(this.allExpsBox);

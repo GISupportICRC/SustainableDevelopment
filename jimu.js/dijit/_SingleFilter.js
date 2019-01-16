@@ -59,6 +59,9 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
     valueProviderFactory: null,
     valueProvider: null,
 
+    //optional, false: setting data logic, true: runtime data logic #12627
+    runtime: false,
+
     //public methods:
     //toJson: UI->partsObj
     //
@@ -77,9 +80,17 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
     postCreate:function(){
       this.inherited(arguments);
       this._initSelf();
-      this.own(on(document, 'click', lang.hitch(this, function(){
+      // this.own(on(document, 'click', lang.hitch(this, function(){
+      //   html.setStyle(this.valueTypePopupNode, 'display', 'none');
+      // })));
+      this._documentClickHandler = lang.hitch(this, this._documentClickEvent);
+      document.addEventListener('click', this._documentClickHandler , {capture: true});
+    },
+
+    _documentClickEvent: function(){
+      if(this.valueTypePopupNode){
         html.setStyle(this.valueTypePopupNode, 'display', 'none');
-      })));
+      }
     },
 
     toJson:function(){
@@ -108,6 +119,7 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
       //caseSensitive
       part.caseSensitive = this.cbxCaseSensitive.getStatus() && this.cbxCaseSensitive.getValue();
 
+      var valueType = this._getValueTypeByUI();
       //interactiveObj
       var isUseAskForvalues = this._isUseAskForValues();
       if(isUseAskForvalues){
@@ -122,7 +134,7 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
           cascade: "none"
         };
         // if(this.uniqueRadio && this.uniqueRadio.checked){
-        if(this._getValueTypeByUI() === "unique"){
+        if(valueType === "unique" || valueType === "multiple"){
           part.interactiveObj.cascade = this.cascadeSelect.get("value");
         }
       }
@@ -132,12 +144,20 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
         isValid:true,
         type: ''
       };
+      // var valueObj;
+      //multiple and unique(new) need interactiveObj to valid config
+      //it works when no selected & askForValues is true
+      // if(valueType === 'multiple' || valueType === 'unique'){
+      //   valueObj = isUseAskForvalues ? this.valueProvider.tryGetValueObject(part) :
+      //   this.valueProvider.getValueObject(part);
+      // }else{
       //tryGetValueObject() let empty value pass
       var valueObj = isUseAskForvalues ? this.valueProvider.tryGetValueObject() : this.valueProvider.getValueObject();
+      // }
       if(!valueObj){
         return null;
       }
-      valueObj.type = this._getValueTypeByUI();
+      valueObj.type = valueType;
       part.valueObj = valueObj;
 
       return part;
@@ -415,7 +435,7 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
         this._updatePrompt();
         this.promptTB.set('value', interactiveObj.prompt || '');
         this.hintTB.set('value', interactiveObj.hint || '');
-        if (this.part.valueObj.type === 'unique') {
+        if (this.part.valueObj.type === 'unique' || this.part.valueObj.type === 'multiple') {
           this.cascadeSelect.set("value", interactiveObj.cascade);
         } else {
           this.cascadeSelect.set("value", "none");
@@ -452,6 +472,7 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
       html.removeClass(this.domNode, 'value-type');
       html.removeClass(this.domNode, 'field-type');
       html.removeClass(this.domNode, 'unique-type');
+      // html.removeClass(this.domNode, 'multiple-type');
       html.removeClass(this.domNode, 'support-cascade');
 
       var valueType = this._getValueTypeByUI();
@@ -496,6 +517,15 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
       }
     },
 
+    _setVisibleValueTypeSelectOption: function(valueType, isDisplay){
+      var node = query('li[data-type=' + valueType + ']', this.valueTypePopupNode)[0];
+      if(isDisplay){
+        html.setStyle(node, 'display', 'block');
+      }else{
+        html.setStyle(node, 'display', 'none');
+      }
+    },
+
     _onValueTypeSetClick: function(evt){
       var position = html.position(evt.target);
       var rNode;
@@ -517,20 +547,20 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
 
       var topMargin;
       if(html.hasClass(query('.desktop-add-section', rNode.parentNode)[0], 'hidden')){
-        topMargin = 55;
+        topMargin = 55 - 60;
       }else{
-        topMargin = 90;
+        topMargin = 90 - 60;
       }
       var top = position.y - rPosition.y - rNode.parentNode.scrollTop + topMargin;
       if(top + 170 > rNode.parentNode.scrollHeight){
-        top = rNode.parentNode.scrollHeight - 170;
+        top = rNode.parentNode.scrollHeight - 170 - 40;
       }
 
       var left;
       if(window.isRTL){
         left = position.x - rPosition.x + 20;
       }else{
-        left = position.x - rPosition.x - 100;
+        left = position.x - rPosition.x - 100 - 90;
         if(left + 150 > rNode.clientWidth){
           left = rNode.clientWidth - 150;
         }
@@ -570,16 +600,48 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
       this._enableValueTypeSelectOption("unique", enabled);
     },
 
+    _enableUniquePredefinedTypeOption: function(enabled){
+      if(this.runtime){
+        this._setVisibleValueTypeSelectOption("uniquePredefined", false);
+      }else{
+        this._enableValueTypeSelectOption("uniquePredefined", enabled);
+      }
+    },
+
+    _enableValuesTypeOption: function(enabled){
+      this._enableValueTypeSelectOption("values", enabled);
+    },
+
+    _enableMultipleTypeOption: function(enabled){
+      this._enableValueTypeSelectOption("multiple", enabled);
+    },
+
+    _enableMultiplePredefinedTypeOption: function(enabled){
+      if(this.runtime){
+        this._setVisibleValueTypeSelectOption("multiplePredefined", false);
+      }else{
+        this._enableValueTypeSelectOption("multiplePredefined", enabled);
+      }
+    },
+
     _enableAllValueTypeOptions:function(){
       this._enableValueTypeOption(true);
       this._enableFieldTypeOption(true);
       this._enableUniqueTypeOption(true);
+      this._enableUniquePredefinedTypeOption(true);
+      this._enableMultipleTypeOption(true);
+      // this._enableValuesTypeOption(true); //hide this
+      this._enableMultiplePredefinedTypeOption(true);
     },
 
     _disableAllValueTypeOptions:function(){
       this._enableValueTypeOption(false);
       this._enableFieldTypeOption(false);
       this._enableUniqueTypeOption(false);
+      this._enableUniquePredefinedTypeOption(false);
+      this._enableMultipleTypeOption(false);
+      // this._enableValuesTypeOption(false);  //hide this
+      this._enableMultiplePredefinedTypeOption(false);
     },
 
     _resetByFieldAndOperator: function(/*optional*/ partObj, /*optional*/ _valueType){
@@ -627,6 +689,7 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
           };
         }
 
+        // this._enableTypeOptionsBySoupport(valueTypes);
         if (valueTypes.indexOf('value') >= 0) {
           this._enableValueTypeOption(true);
         }
@@ -636,6 +699,19 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
         if (valueTypes.indexOf('unique') >= 0) {
           this._enableUniqueTypeOption(true);
         }
+        if (valueTypes.indexOf('values') >= 0) {
+          this._enableValuesTypeOption(true);
+        }
+        //unique & multiple predefined only appears on the setting page
+        if (valueTypes.indexOf('uniquePredefined') >= 0) {
+          this._enableUniquePredefinedTypeOption(true);
+        }
+        if (valueTypes.indexOf('multiple') >= 0) {
+          this._enableMultipleTypeOption(true);
+        }
+        if (valueTypes.indexOf('multiplePredefined') >= 0) {
+          this._enableMultiplePredefinedTypeOption(true);
+        }
 
         if(valueType === 'value'){
           this._enableValueTypeOption(true);
@@ -643,13 +719,21 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
           this._enableFieldTypeOption(true);
         }else if(valueType === 'unique'){
           this._enableUniqueTypeOption(true);
+        }else if (valueType === 'values') {
+          this._enableValuesTypeOption(true);
+        }else if (valueType === 'uniquePredefined') {
+          this._enableUniquePredefinedTypeOption(true);
+        }else if (valueType === 'multiple') {
+          this._enableMultipleTypeOption(true);
+        }else if (valueType === 'multiplePredefined') {
+          this._enableMultiplePredefinedTypeOption(true);
         }
 
         this._updateValueTypeUI(valueType);
       }
 
       if (valueTypes.length > 0) {
-        this.valueProvider = this.valueProviderFactory.getValueProvider(partObj, false);
+        this.valueProvider = this.valueProviderFactory.getValueProvider(partObj, this.runtime);
         this.valueProvider.placeAt(this.valueProviderContainer);
         this.valueProvider.setValueObject(partObj.valueObj);
         this.own(on(this.valueProvider, 'change', lang.hitch(this, function(){
@@ -682,14 +766,24 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
       this.emit('change');
     },
 
+    // allValueTypes:['value', 'field', 'unique', 'multiple', 'values', 'uniquePredefined', 'multipleDynmic', 'multiplePredefined'],
+    // _enableTypeOptionsBySoupport:function(valueTypes){
+    //   var types = allValueTypes;
+    //   array.forEach(types,function(type){
+    //     if (valueTypes.indexOf(type) >= 0) {
+    //       this._enableValueTypeOption(true);
+    //     }
+    //   });
+    // },
+
     _updateWhenValueRadioChanged: function(){
-      this._updatePrompt();
+      this._updatePrompt(false, true);
       this._updateValueTypeClass();
     },
 
     _onCbxAskValuesClicked:function(){
       this._updateRequiredProperty();
-      this._updatePrompt();
+      this._updatePrompt(true);
     },
 
     _onCbxAskValuesStatusChanged: function(){
@@ -697,7 +791,12 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
     },
 
     _isUseAskForValues: function(){
-      return this.cbxAskValues.status && this.cbxAskValues.checked;
+      var valueType = this._getValueTypeByUI();
+      if(valueType === 'uniquePredefined' || valueType === 'multiplePredefined'){
+        return true;
+      }else{
+        return this.cbxAskValues.status && this.cbxAskValues.checked;
+      }
     },
 
     _isValueRequired: function(){
@@ -731,10 +830,13 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
       }
     },
 
-    _updatePrompt: function(){
+    _updatePrompt: function(ifClick, ifTypeChange){ //call three times when setting's initing
       this.promptTB.set('value', '');
       this.hintTB.set('value', '');
       this.cbxAskValues.setStatus(true);
+      if(!ifClick && ifTypeChange){
+        this.cbxAskValues.uncheck(true);//check works after setting status true
+      }
       html.setStyle(this.promptTable, 'display', 'table');
 
       var operator = this.operatorsSelect.get('value');
@@ -753,6 +855,26 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
         this.cbxAskValues.setStatus(false);
       }
 
+      var cbxValue = this.cbxAskValues.getValue();
+      var predefinedTypes = ['uniquePredefined', 'multiplePredefined'];
+      var ifPredefined = predefinedTypes.indexOf(valueType) >= 0 ? true: false;
+      if(ifPredefined){
+        this.cbxAskValues.check(true);
+      }
+      else if(ifClick){
+        if(cbxValue){
+          this.cbxAskValues.check(true);
+        }else{
+          this.cbxAskValues.uncheck(true);
+        }
+      }else if(supportAskForValue){
+        if(!this.cbxAskValues.status){
+          this.cbxAskValues.check(true);
+        }
+      }else{
+        this.cbxAskValues.uncheck(true);
+      }
+
       if(this.cbxAskValues.status && this.cbxAskValues.checked){
         html.setStyle(this.promptTable, 'display', 'table');
         var fieldInfo = this._getSelectedFilteringItem(this.fieldsSelect);
@@ -766,6 +888,10 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
       }else{
         html.setStyle(this.promptTable, 'display', 'none');
       }
+
+      if(ifPredefined){
+        this.cbxAskValues.setStatus(false);
+      }
     },
 
     _destroySelf:function(){
@@ -774,6 +900,9 @@ function(Evented, declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin
 
     destroy: function(){
       this._removeFieldsSelectChangeAndOperatorChangeEvents();
+      if(this._documentClickHandler){
+        document.removeEventListener('click', this._documentClickHandler, {capture: true});
+      }
       this.inherited(arguments);
     }
   });

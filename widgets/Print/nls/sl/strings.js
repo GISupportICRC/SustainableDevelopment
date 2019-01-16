@@ -34,5 +34,7 @@ define({
   "print": "Natisni",
   "clearList": "Odstrani tisk",
   "creatingPrint": "Ustvarjanje tiska",
-  "printError": "Napaka, poskusite znova"
+  "printError": "Napaka, poskusite znova",
+  "forceFeatureAttributes": "Atributi geoobjekta",
+  "includeFeatureAttributes": "Vsebuje atribute"
 });

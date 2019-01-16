@@ -40,5 +40,21 @@ define({
   "sortDes": "Aflopend sorteren",
   "statistics": "Statistieken",
   "attachments": "Bijlagen",
-  "files": "bestanden"
+  "files": "bestanden",
+  "keepRichTextLabel": "Rich text-formaat behouden",
+  "whatsThis": "Wat is dit?",
+  "richTextMessage": {
+    "explanatoryText": {
+      "line1": "${layerName} bevat de volgende rich text-veld(en): ",
+      "line2": " dat kan tekstopmaakstijlen omvatten, zoals lettertypen, kleuren of tekstformaten.",
+      "line3": "Bij export naar CSV worden de opmaakstijlen bewaard in de vorm van HTML-tags. U kunt ervoor kiezen om de rich-text-formaten niet te behouden door het vakje \"Rich text-formaat behouden\" uit te schakelen."
+    },
+    "example": {
+      "label": "Bijvoorbeeld:",
+      "scenarios": {
+        "first": "wordt standaard als de volgende tekst geëxporteerd:",
+        "second": "en de volgende tekst zonder rich text-formaat:"
+      }
+    }
+  }
 });

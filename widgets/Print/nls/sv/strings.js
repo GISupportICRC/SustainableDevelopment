@@ -34,5 +34,7 @@ define({
   "print": "Skriv ut",
   "clearList": "Rensa utskrifter",
   "creatingPrint": "Skapar utskrift",
-  "printError": "Fel, försök igen"
+  "printError": "Fel, försök igen",
+  "forceFeatureAttributes": "Geoobjektattribut",
+  "includeFeatureAttributes": "Inkludera attribut"
 });

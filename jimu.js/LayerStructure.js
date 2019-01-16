@@ -245,6 +245,10 @@ define([
         lang.hitch(this, this._onOpacityChanged));
       this._eventHandles.push(handle);
 
+      handle = on(this._layerInfos,
+        'layerInfosTimeExtentChanged',
+        lang.hitch(this, this._onTimeExtentChanged));
+      this._eventHandles.push(handle);
     },
 
     // emit event when layerNode and tableNode changed.
@@ -322,8 +326,15 @@ define([
         layerNodes: changedNodes
       };
       this._emitEvent(clazz.EVENT_OPACITY_CHANGE, eventObject);
-    }
+    },
 
+    _onTimeExtentChanged: function(changedLayerInfos) {
+      var changedNodes = this._getNodesArrayFromInfosArray(changedLayerInfos);
+      var eventObject = {
+        layerNodes: changedNodes
+      };
+      this._emitEvent(clazz.EVENT_TIME_EXTENT_CHANGE, eventObject);
+    }
   });
 
   var instance = null;
@@ -356,7 +367,8 @@ define([
     EVENT_VISIBILITY_CHANGE: "visibility-change",
     EVENT_FILTER_CHANGE: "filter-change",
     EVENT_RENDERER_CHANGE: "renderer-change",
-    EVENT_OPACITY_CHANGE: "opacity-change"
+    EVENT_OPACITY_CHANGE: "opacity-change",
+    EVENT_TIME_EXTENT_CHANGE: "time-extent-change"
   });
 
   return clazz;

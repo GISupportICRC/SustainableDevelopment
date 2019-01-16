@@ -20,6 +20,7 @@ define([
   'dojo/_base/lang',
   'dojo/_base/html',
   'dojo/_base/array',
+  'dojo/on',
   'dojo/_base/declare',
   './ValueProvider',
   'dijit/_TemplatedMixin',
@@ -29,7 +30,7 @@ define([
   'jimu/utils',
   'dijit/form/FilteringSelect'
 ],
-  function(aspect, Deferred, lang, html, array, declare, ValueProvider, _TemplatedMixin, _WidgetsInTemplateMixin,
+  function(aspect, Deferred, lang, html, array, on, declare, ValueProvider, _TemplatedMixin, _WidgetsInTemplateMixin,
     template, Memory, jimuUtils) {
 
     return declare([ValueProvider, _TemplatedMixin, _WidgetsInTemplateMixin], {
@@ -38,12 +39,16 @@ define([
       staticValues: null,//[{value,label}]
       showNullValues: false,//show null values
       layerDataChanged: false, //layer data update status
+      ifDropDown: false,
 
       postCreate: function(){
         this.inherited(arguments);
         html.addClass(this.domNode, 'jimu-filter-list-value-provider');
 
         this._uniqueValueCache = {};
+        this.noDataTips = '<div class="error-tip-section" style="display: block;">' +
+                          '<span class="jimu-icon jimu-icon-error"></span>' +
+                          '<span class="jimu-state-error-text">' + this.nls.noFilterValueTip + '</span></div>';
 
         //[{id,value,label}]
         var store = new Memory({idProperty:'id', data: []});
@@ -56,6 +61,8 @@ define([
                             "_onDropDownMouseDown",
                             lang.hitch(this, this._onBeforeDropDownMouseDown))
             );
+            this.own(on(document.body, 'click', lang.hitch(this, this._onBodyClick)));
+
             if(this.layerInfo){ //it always exsits because it's required from valueProviderFactory constructor
               //it will tragger after the  add/remove/update events happen
               this.layerInfo.layerObject.on("edits-complete", lang.hitch(this, function() {
@@ -78,8 +85,19 @@ define([
       },
 
       _onBeforeDropDownMouseDown: function(){
+        this.ifDropDown = true;
         this._tryUpdatingUniqueValues(undefined, true);
         return arguments;
+      },
+
+      _onBodyClick: function(evt){
+        var target = evt.target || evt.srcElement;
+        if(target === this.domNode || html.isDescendant(target, this.domNode)){
+          return;
+        }
+        if(this.msgDiv){
+          html.setStyle(this.msgDiv, "display", "none");
+        }
       },
 
       getDijits: function(){
@@ -167,6 +185,7 @@ define([
               this.valuesSelect.set('item', selectedItem);
             }
           }
+          this._checkIfNoData();
         }
       },
 
@@ -198,6 +217,7 @@ define([
               if(showDropDownAfterValueUpdate){
                 this.valuesSelect.toggleDropDown();
               }
+              this._checkIfNoData();
               def.resolve();
             }), lang.hitch(this, function(err){
               console.error(err);
@@ -207,12 +227,15 @@ define([
               this._uniqueValueLoadingDef = null;
               this.valuesSelect.readOnly = false;
               this._hideLoadingIcon();
+              this._checkIfNoData();
               def.reject(err);
             }));
           }else{
+            this._checkIfNoData();
             def.resolve();
           }
         }else{
+          this._checkIfNoData();
           def.resolve();
         }
         return def;
@@ -266,6 +289,23 @@ define([
         //selectedItem maybe null
         //we need to set item to null to clear the previous invlaid value
         this.valuesSelect.set('item', selectedItem);
+      },
+
+      _checkIfNoData: function(){
+        if(this.runtime && this.ifDropDown){
+          this.ifDropDown = false;
+          var dataList = this.valuesSelect.store.data;
+          if (dataList.length === 0) {
+            if(!this.msgDiv){
+              this.msgDiv = document.createElement('div');
+              html.addClass(this.msgDiv, "jimu-filter-list-value-provider-tip-container");
+              this.msgDiv.innerHTML = this.noDataTips;
+              this.valuesSelect.domNode.parentNode.appendChild(this.msgDiv);
+            }else{
+              html.setStyle(this.msgDiv, "display", "block");
+            }
+          }
+        }
       },
 
       _showLoadingIcon: function(){

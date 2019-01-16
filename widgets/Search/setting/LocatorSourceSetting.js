@@ -76,9 +76,11 @@ define(
       geocoderPopup: null,
 
       _clickSet: false,
+      _defaultZoomScale: null,
 
       postCreate: function() {
         this.inherited(arguments);
+        this.zoomScale.set('placeHolder', window.jimuNls.common.defaults);
         this.exampleHint = this.nls.locatorExample +
           ": http://&lt;myServerName&gt;/arcgis/rest/services/World/GeocodeServer";
 
@@ -177,7 +179,7 @@ define(
           singleLineFieldName: this.singleLineFieldName,
           placeholder: jimuUtils.stripHTML(this.placeholder.get('value')),
           countryCode: jimuUtils.stripHTML(this.countryCode.get('value')),
-          zoomScale: this.zoomScale.get('value') || 50000,
+          zoomScale: this.zoomScale.get('value') || this._defaultZoomScale,
           maxSuggestions: this.maxSuggestions.get('value') || 6,
           maxResults: this.maxResults.get('value') || 6,
           searchInCurrentMapExtent: this.searchInCurrentMapExtent.checked,
@@ -264,7 +266,7 @@ define(
 
         this.searchInCurrentMapExtent.setValue(!!config.searchInCurrentMapExtent);
 
-        this.zoomScale.set('value', config.zoomScale || 50000);
+        this.zoomScale.set('value', config.zoomScale || this._defaultZoomScale);
 
         this.maxSuggestions.set('value', config.maxSuggestions || 6);
 

@@ -5,6 +5,12 @@ define({
   "actions": "Konfigūruoti sluoksnio laukus",
   "field": "Laukas",
   "alias": "Pseudonimas",
+  "url": "URL",
+  "sortField": "Rūšiuoti lauką",
+  "sortOrderTooltips": {
+    "toDescending": "Pakeisti į mažėjimo tvarką",
+    "toAscending": "Pakeisti į didėjimo tvarką"
+  },
   "visible": "Matoma",
   "linkField": "Nuorodos laukas",
   "noLayers": "Elementų sluoksnių nėra",

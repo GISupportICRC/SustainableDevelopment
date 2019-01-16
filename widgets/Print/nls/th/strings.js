@@ -34,5 +34,7 @@ define({
   "print": "พิมพ์",
   "clearList": "ล้างภาพพิมพ์",
   "creatingPrint": "การสร้างงานพิมพ์",
-  "printError": "ข้อผิดพลาด ลองอีกครั้ง"
+  "printError": "ข้อผิดพลาด ลองอีกครั้ง",
+  "forceFeatureAttributes": "ฟีเจอร์แอตทริบิวต์",
+  "includeFeatureAttributes": "รวมแอตทริบิวด์"
 });

@@ -151,10 +151,10 @@ define(['dojo/_base/declare',
               }
             }
           }
-          //html.setStyle(query(".label", this.dmoNode)[0], 'color', utils.invertColor(background.color));//auto color for text
+          //html.setStyle(query(".label", this.domNode)[0], 'color', utils.invertColor(background.color));//auto color for text
           var confirm = this.config.splash.confirm;
-          if (typeof confirm !== "undefined") {
-            var dom = query(".label", this.dmoNode)[0];
+          if (typeof confirm !== "undefined" && this.domNode) {
+            var dom = query(".label", this.domNode)[0];
             if ("undefined" !== typeof confirm.color && dom) {
               html.setStyle(dom, 'color', confirm.color);
             }

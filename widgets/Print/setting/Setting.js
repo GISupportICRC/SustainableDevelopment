@@ -139,10 +139,11 @@ define([
         domStyle.set(this.defaultFormat.domNode.parentNode.parentNode, 'display', '');
         domStyle.set(this.defaultLayout.domNode.parentNode.parentNode, 'display', '');
         // domStyle.set(this.showAdvancedOptionChk.domNode.parentNode.parentNode, 'display', '');
-        var validPrintTask = false;
+        var hasWebmapParam = false, hasOutputParam = false;
 
         if (data && data.parameters) {
           var len = data.parameters.length;
+          var webmapParam = 'web_map_as_json', outputParam = 'output_file';
           for (var i = 0; i < len; i++) {
             var param = data.parameters[i];
             if (param.name === "Format" || param.name === "Layout_Template") {
@@ -176,12 +177,17 @@ define([
                   this.defaultLayout.set('value', defaultValue);
                 }
               }
-              validPrintTask = true;
+            }
+            if (typeof param.name === 'string' && param.name.toLowerCase() === webmapParam) {
+              hasWebmapParam = true;
+            }
+            if (typeof param.name === 'string' && param.name.toLowerCase() === outputParam) {
+              hasOutputParam = true;
             }
           }
         }
 
-        if (!validPrintTask) {
+        if (!hasWebmapParam || !hasOutputParam) {
           this.validUrl = false;
           this.serviceURL.validate();
         }

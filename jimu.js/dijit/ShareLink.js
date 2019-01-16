@@ -38,6 +38,8 @@ define(['dojo/_base/declare',
     'esri/request',
     'esri/tasks/query',
     'esri/tasks/QueryTask',
+    'esri/symbols/jsonUtils',
+    'esri/InfoTemplate',
     "esri/symbols/PictureMarkerSymbol",
     "esri/graphic",
     "esri/layers/GraphicsLayer",
@@ -54,7 +56,8 @@ define(['dojo/_base/declare',
   ],
   function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, lang, array, dojoClass, html,
            on, topic, dojoQuery, jimuUtils, shareUtils, dojoConfig, dojoCookie,
-           template, dojoString, Select, NumberTextBox, domAttr, Deferred, esriRequest, EsriQuery, QueryTask,
+           template, dojoString, Select, NumberTextBox, domAttr, Deferred,
+           esriRequest, EsriQuery, QueryTask, symbolJsonUtils, InfoTemplate,
            PictureMarkerSymbol, Graphic, GraphicsLayer, FeaturelayerChooserFromMap, LayerChooserFromMapWithDropbox) {
     var so = declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
       templateString: template,
@@ -1016,22 +1019,81 @@ define(['dojo/_base/declare',
       },
 
       //add and remove marker ,when click marker icon in linkOptions
-      _addGraphicsLayer: function() {
+      _addGraphicsLayer: function () {
         if (!window.isBuilder && typeof this._graphicsLayer === "undefined") {
-          this._graphicsLayer = new GraphicsLayer();
-          this.map.addLayer(this._graphicsLayer);
+          if (this.map.getLayer("marker-feature-action-layer")) {
+            this._graphicsLayer = this.map.getLayer("marker-feature-action-layer");
+          } else {
+            this._graphicsLayer = new GraphicsLayer({ id: "marker-feature-action-layer" });
+            this.map.addLayer(this._graphicsLayer);
+          }
         }
       },
       _removeGraphicsLayer: function() {
         if (!window.isBuilder && typeof this._graphicsLayer !== "undefined") {
+          //close popup
+          if (this.map.infoWindow && this.map.infoWindow.features &&
+            this.map.infoWindow.features[0] === this._markerGraphic) {
+            this.map.infoWindow.hide();
+          }
+          //clean text
+          if (this._markerGraphic && this._markerGraphic._textSymbol) {
+            this._graphicsLayer.remove(this._markerGraphic._textSymbol);
+          }
+
           this._graphicsLayer.remove(this._markerGraphic);
           this._markerGraphic = null;
         }
       },
-      _addGraphicsLayerMarker: function(evt) {
+      _addGraphicsLayerMarker: function (evt) {
         if (!window.isBuilder && typeof this._graphicsLayer !== "undefined") {
-          this._markerGraphic = this._getMarkerGraphic(evt.mapPoint);
-          this._graphicsLayer.add(this._markerGraphic);
+          if (this.optionSrc !== "addMarker") {
+            this._markerGraphic = this._getMarkerGraphic(evt.mapPoint);
+            this._graphicsLayer.add(this._markerGraphic);
+          } else {
+            //1
+            var infoTemplate = new InfoTemplate('', (this.addMarker_title.get("value") || ""));
+            //template.isIncludeShareUrl
+            //2
+            var markerSymbol = symbolJsonUtils.fromJson({
+              "type": "esriPMS",
+              "url": require.toUrl('jimu') + "/images/EsriBluePinCircle26.png",
+              "contentType": "image/png"
+            });
+            markerSymbol.width = 26;
+            markerSymbol.height = 26;
+            markerSymbol.setOffset(0, 12);
+            this._markerGraphic = new Graphic(evt.mapPoint, markerSymbol, null, infoTemplate);
+            this._graphicsLayer.add(this._markerGraphic);
+
+            //3
+            var textSymbol = symbolJsonUtils.fromJson({
+              "color": [0, 0, 0, 255],
+              "type": "esriTS",
+              "verticalAlignment": "baseline",
+              "horizontalAlignment": "left",
+              "angle": 0,
+              "xoffset": 0,
+              "yoffset": 0,
+              "rotated": false,
+              "kerning": true,
+              "font": {
+                "size": 12,
+                "style": "normal",
+                "weight": "bold",
+                "family": "Arial"
+              },
+              "text": this.addMarker_label.get("value") || ""
+            });
+            if (textSymbol) {
+              textSymbol.xoffset = markerSymbol.width / 2;
+              textSymbol.yoffset = markerSymbol.height / 2 + markerSymbol.yoffset;
+              var textG = new Graphic(evt.mapPoint, textSymbol);
+              this._graphicsLayer.add(textG);
+
+              this._markerGraphic._textSymbol = textG;
+            }
+          }
         }
       },
       _getMarkerGraphic: function(mapPoint) {

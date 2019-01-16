@@ -5,6 +5,12 @@ define({
   "actions": "Configurare câmpuri strat tematic",
   "field": "Câmp",
   "alias": "Pseudonim",
+  "url": "URL",
+  "sortField": "Câmp de sortare",
+  "sortOrderTooltips": {
+    "toDescending": "Comutare la sortarea în ordine descendentă",
+    "toAscending": "Comutare la sortarea în ordine ascendentă"
+  },
   "visible": "Vizibil",
   "linkField": "Câmp link",
   "noLayers": "Nu este disponibil niciun strat tematic de obiecte spaţiale",

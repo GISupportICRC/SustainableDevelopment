@@ -5,6 +5,12 @@ define({
   "actions": "Kihi väljade seadistamine",
   "field": "Väli",
   "alias": "Alias",
+  "url": "URL",
+  "sortField": "Sortimise väli",
+  "sortOrderTooltips": {
+    "toDescending": "Vali laskuv järjestus",
+    "toAscending": "Vali tõusev järjestus"
+  },
   "visible": "Nähtav",
   "linkField": "Lingi väli",
   "noLayers": "Objektikihte pole saadaval",

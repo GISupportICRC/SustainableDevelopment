@@ -5,6 +5,12 @@ define({
   "actions": "Määritä karttatason kentät",
   "field": "Kenttä",
   "alias": "Alias",
+  "url": "URL-osoite",
+  "sortField": "Lajittelukenttä",
+  "sortOrderTooltips": {
+    "toDescending": "Vaihda laskevaan järjestykseen",
+    "toAscending": "Vaihda nousevaan järjestykseen"
+  },
   "visible": "Näkyvä",
   "linkField": "Linkkikenttä",
   "noLayers": "Kohdekarttatasoja ei ole käytettävissä",

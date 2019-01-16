@@ -5,6 +5,12 @@ define({
   "actions": "Layer-Felder konfigurieren",
   "field": "Feld",
   "alias": "Alias",
+  "url": "URL",
+  "sortField": "Sortierfeld",
+  "sortOrderTooltips": {
+    "toDescending": "In absteigende Reihenfolge ändern",
+    "toAscending": "In aufsteigende Reihenfolge ändern"
+  },
   "visible": "Sichtbar",
   "linkField": "Link-Feld",
   "noLayers": "Keine Feature-Layer verfügbar",

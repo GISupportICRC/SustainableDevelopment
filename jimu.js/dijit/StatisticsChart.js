@@ -1495,11 +1495,21 @@ define([
         var chartOptions = this._getBasicChartOptionsByStatisticsInfo(mode, options, data, type);
         this._udpateJimuChartDisplayOptions(chartOptions, chartTypeInfo);
 
+        var DEFAULT_CONFIG = {
+          type: type || 'column',
+          labels: [],
+          series: [{
+            data: []
+          }]
+        };
         var chart = new JimuChart({
           chartDom: chartDiv,
-          config: chartOptions
+          config: DEFAULT_CONFIG
         });
         chart.placeAt(chartDiv);
+        chart.resize();
+
+        chart.updateConfig(chartOptions);
         this._bindChartEvent(chart, mode, data);
 
         if(this.showSettingIcon){
@@ -1523,120 +1533,92 @@ define([
         var type = chartTypeInfo.type;
         var displayConfig = chartTypeInfo.display;
 
-        var mixinOptions = {
-          type: type,
-          dataZoom: ["inside", "slider"],
-          confine: true,
-          backgroundColor: displayConfig.backgroundColor,
-          color: displayConfig.colors,
-          legend: displayConfig.showLegend,
-          theme: this.theme || "light",
-          advanceOption: function(options){
-            //legend
-            if (displayConfig.showLegend) {
-              if (options.legend) {
-                if (!options.legend.textStyle) {
-                  options.legend.textStyle = {};
-                }
-                options.legend.textStyle.color = displayConfig.legendTextColor;
-                options.legend.textStyle.fontSize = displayConfig.legendTextSize;
-              }
-            }
+        this._settingAxisDisplay(chartOptions, displayConfig, type);
 
-            if(type === 'pie'){
-              if(options.series && options.series.length > 0){
-                array.forEach(options.series, lang.hitch(this, function(item){
-                  if(item.type === 'pie'){
-                    if(!item.label){
-                      item.label = {};
-                    }
-                    if(!item.label.normal){
-                      item.label.normal = {};
-                    }
-                    item.label.normal.show = displayConfig.showDataLabel;
-                    if(!item.label.normal.textStyle){
-                      item.label.normal.textStyle = {};
-                    }
-                    item.label.normal.textStyle.color = displayConfig.dataLabelColor;
-                    item.label.normal.textStyle.fontSize = displayConfig.dataLabelSize;
-                  }
-                }));
-              }
-            }else{
-              //xAxis
-              if(!options.xAxis){
-                options.xAxis = {};
-              }
-              // options.xAxis.show = displayConfig.showHorizontalAxis;
-              if(!options.xAxis.axisLabel){
-                options.xAxis.axisLabel = {};
-              }
-              if(!options.xAxis.axisLabel.textStyle){
-                options.xAxis.axisLabel.textStyle = {};
-              }
-              options.xAxis.axisLabel.textStyle.color = displayConfig.horizontalAxisTextColor;
-              options.xAxis.axisLabel.textStyle.fontSize = displayConfig.horizontalAxisTextSize;
+        chartOptions.type = type;
+        chartOptions.dataZoom = ["inside", "slider"];
+        chartOptions.confine = true;
+        chartOptions.backgroundColor = displayConfig.backgroundColor;
+        chartOptions.color = displayConfig.colors;
 
-              //yAxis
-              if(!options.yAxis){
-                options.yAxis = {};
-              }
-              // options.yAxis.show = displayConfig.showVerticalAxis;
-              if(!options.yAxis.axisLabel){
-                options.yAxis.axisLabel = {};
-              }
-              if(!options.yAxis.axisLabel.textStyle){
-                options.yAxis.axisLabel.textStyle = {};
-              }
-              options.yAxis.axisLabel.textStyle.color = displayConfig.verticalAxisTextColor;
-              options.yAxis.axisLabel.textStyle.fontSize = displayConfig.verticalAxisTextSize;
-              // if(!displayConfig.showVerticalAxis){
-              //   if(window.isRTL){
-              //     options.grid.right = "5%";
-              //   }else{
-              //     options.grid.left = "5%";
-              //   }
-              // }
-            }
-          }
+        var legendOption = {
+          show: displayConfig.showLegend,
+          textStyle: {}
         };
+        if (displayConfig.legendTextColor) {
+          legendOption.textStyle.color = displayConfig.legendTextColor;
+        }
+        if (displayConfig.legendTextSize) {
+          legendOption.textStyle.fontSize = displayConfig.legendTextSize;
+        }
+        chartOptions.legend = legendOption;
+
+        var dataLabelOption = {
+          show: displayConfig.showDataLabel,
+          textStyle: {}
+        };
+        if (displayConfig.dataLabelColor) {
+          dataLabelOption.textStyle.color = displayConfig.dataLabelColor;
+        }
+        if (displayConfig.dataLabelSize) {
+          dataLabelOption.textStyle.fontSize = displayConfig.dataLabelSize;
+        }
+        chartOptions.dataLabel = dataLabelOption;
 
         if(type === 'pie'){
-          mixinOptions.innerRadius = displayConfig.innerRadius;
-          mixinOptions.labelLine = !!displayConfig.showDataLabel;
-        }
-
-        var axisTypes = ['column', 'bar', 'line'];
-
-        if (axisTypes.indexOf(type) > -1) {
-          //stack
-          if (!displayConfig.stack) {
-            displayConfig.stack = false;
-          }
-          //area
-          if (type === 'line' && !displayConfig.area) {
-            displayConfig.area = false;
-          }
-
-          if (type === 'line') {
-            mixinOptions.area = displayConfig.area;
-          }
-
-          if ((type === 'column' || type === 'bar') || (type === 'line' && displayConfig.area)) {
-            mixinOptions.stack = displayConfig.stack;
-          }
-        }
-
-        lang.mixin(chartOptions, mixinOptions);
-
-        if(type !== 'pie'){
-          chartOptions.axisPointer = true;
-          chartOptions.scale = false;
-          chartOptions.hidexAxis = !displayConfig.showHorizontalAxis;
-          chartOptions.hideyAxis = !displayConfig.showVerticalAxis;
+          chartOptions.innerRadius = displayConfig.innerRadius;
         }
 
         return chartOptions;
+      },
+
+      _settingAxisDisplay: function(chartOptions, displayConfig, type) {
+        var axisTypes = ['column', 'bar', 'line'];
+        if (axisTypes.indexOf(type) < 0) {
+          return;
+        }
+        var xAxisOption = {
+          show: displayConfig.showHorizontalAxis,
+          textStyle: {}
+        };
+        if (displayConfig.horizontalAxisTextColor) {
+          xAxisOption.textStyle.color = displayConfig.horizontalAxisTextColor;
+        }
+        if (displayConfig.horizontalAxisTextSize) {
+          xAxisOption.textStyle.fontSize = displayConfig.horizontalAxisTextSize;
+        }
+        chartOptions.xAxis = xAxisOption;
+
+        var yAxisOption = {
+          show: displayConfig.showVerticalAxis,
+          textStyle: {}
+        };
+        if (displayConfig.verticalAxisTextColor) {
+          yAxisOption.textStyle.color = displayConfig.verticalAxisTextColor;
+        }
+        if (displayConfig.verticalAxisTextSize) {
+          yAxisOption.textStyle.fontSize = displayConfig.verticalAxisTextSize;
+        }
+        chartOptions.yAxis = yAxisOption;
+
+        //axis chart, set stack and area
+        if (!displayConfig.stack) {
+          displayConfig.stack = false;
+        }
+        if ((type === 'column' || type === 'bar') || (type === 'line' && displayConfig.area)) {
+          chartOptions.stack = displayConfig.stack;
+        }
+        //area
+        if (type === 'line' && !displayConfig.area) {
+          displayConfig.area = false;
+        }
+
+        if (type === 'line') {
+          chartOptions.area = displayConfig.area;
+        }
+        //axisPointer, scale, hidexAxis, hideyAxis
+        chartOptions.axisPointer = true;
+        chartOptions.scale = false;
       },
 
       _getBasicChartOptionsByStatisticsInfo: function(mode, options, data, type){

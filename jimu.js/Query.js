@@ -102,11 +102,7 @@ define([
           if(feautreCount === 0){
             return 0;
           }
-          if(this.queryType === 3){
-            return 1;
-          }else{
-            return Math.ceil(feautreCount / this.pageSize);
-          }
+          return Math.ceil(feautreCount / this.pageSize);
         }));
       },
 
@@ -131,12 +127,27 @@ define([
               return featureSet;
             }));
           }else{
-            return this._getEmptyFeatureSet();
+            // return this._getEmptyFeatureSet();
+            this._getEmptyFeatureSet().then(lang.hitch(this, function(emptyFeatureSet) {
+              return emptyFeatureSet;
+            }));
           }
         }));
       },
 
       _getEmptyFeatureSet: function(){
+        var def = new Deferred();
+        if(!(this.layerDefinition && this.layerDefinition.geometryType)){
+          this._getLayerDefinition().then(lang.hitch(this, function(){
+            def.resolve(this._getEmptyFeatureSetHandler());
+          }));
+        }else{
+          def.resolve(this._getEmptyFeatureSetHandler());
+        }
+        return def;
+      },
+
+      _getEmptyFeatureSetHandler: function(){
         var featureSet = new FeatureSet();
         featureSet.features = [];
         featureSet.geometryType = this.layerDefinition.geometryType;
@@ -172,14 +183,20 @@ define([
       //queryByPage doesn't change current page index, queryNextPage does
       queryByPage: function(pageIndex){
         var def = null;
-        var emptyFeatureSet = this._getEmptyFeatureSet();
+        //need layerDefinition from _getLayerDefinition() from _getQueryType() from getFeatureCount() from constructor
+        // var emptyFeatureSet = this._getEmptyFeatureSet();
         if(pageIndex <= 0){
           def = new Deferred();
-          def.resolve(emptyFeatureSet);
+          this._getEmptyFeatureSet().then(lang.hitch(this, function(emptyFeatureSet) {
+            def.resolve(emptyFeatureSet);
+          }));
         }else{
           def = this.getPageCount().then(lang.hitch(this, function(pageCount) {
             if (pageIndex > pageCount) {
-              return emptyFeatureSet;
+              // return emptyFeatureSet;
+              this._getEmptyFeatureSet().then(lang.hitch(this, function(emptyFeatureSet) {
+                return emptyFeatureSet;
+              }));
             }
             if (this.queryType === 1) {
               return this._queryPageForType1(pageIndex);
@@ -353,10 +370,11 @@ define([
         var queryParams = new EsriQuery();
         queryParams.where = where || this.query.where;
         queryParams.geometry = this.query.geometry;
-        queryParams.outSpatialReference = this.map.spatialReference;
+        queryParams.outSpatialReference = this.query.outSpatialReference;
         queryParams.returnGeometry = this.query.returnGeometry;
         queryParams.spatialRelationship = this.query.spatialRelationship;
         queryParams.outFields = this.query.outFields;
+        queryParams.returnDistinctValues = this.query.returnDistinctValues; //for distinct values
         var queryTask = new QueryTask(this.url);
         return queryTask.execute(queryParams);
       },
@@ -438,6 +456,7 @@ define([
         queryParams.returnGeometry = this.query.returnGeometry;
         queryParams.spatialRelationship = this.query.spatialRelationship;
         queryParams.outFields = this.query.outFields;
+        queryParams.returnDistinctValues = this.query.returnDistinctValues; //for distinct values
         //set pagination info
         queryParams.start = resultOffset;
         queryParams.num = this.pageSize;

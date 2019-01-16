@@ -34,5 +34,7 @@ define({
   "print": "Tisk",
   "clearList": "Vymazat výtisky",
   "creatingPrint": "Vytváření výtisku",
-  "printError": "Chyba, zkuste to znovu."
+  "printError": "Chyba, zkuste to znovu.",
+  "forceFeatureAttributes": "Atributy prvků",
+  "includeFeatureAttributes": "Zahrnout atributy"
 });
