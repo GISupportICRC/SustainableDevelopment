@@ -21,12 +21,12 @@ define([
     'dojo/promise/all',
     'esri/lang',
     'jimu/portalUrlUtils',
-    './table/c_FeatureTable',
+    './table/_FeatureTable',
     // './_RelationshipTable',
     './utils'
 ], function(declare, lang, array, Deferred, all,
     esriLang, portalUrlUtils,
-    c_FeatureTable, /* _RelationshipTable,*/ attrUtils) {
+    _FeatureTable, /* _RelationshipTable,*/ attrUtils) {
     return declare(null, {
         _activeLayerInfoId: null,
         _activeRelationshipKey: null,
@@ -162,7 +162,7 @@ define([
 
         // def.resolve({
         //   isSupportQuery: tableInfo.isSupportQuery,
-        //   table: this.featureTableSet[tabId] // instance of c_FeatureTable
+        //   table: this.featureTableSet[tabId] // instance of _FeatureTable
         // });
         // tabId: id of layerInfo
         getQueryTable: function(tabId, enabledMatchingMap, hideExportButton, allowTextSelection) {
@@ -203,7 +203,7 @@ define([
                             layerFields
                         );
 
-                        var table = new c_FeatureTable({
+                        var table = new _FeatureTable({
                             map: this.map,
                             matchingMap: enabledMatchingMap,
                             hideExportButton: hideExportButton,

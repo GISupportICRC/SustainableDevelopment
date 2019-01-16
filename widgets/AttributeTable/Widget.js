@@ -35,7 +35,7 @@ define([
     "dojo/query",
     'jimu/dijit/LoadingIndicator',
     'jimu/FilterManager',
-    './c_ResourceManager',
+    './_ResourceManager',
     // './_TableFunctionController',
     './utils'
   ],
@@ -61,7 +61,7 @@ define([
     domQuery,
     LoadingIndicator,
     FilterManager,
-    c_ResourceManager,
+    _ResourceManager,
     attrUtils) {
     var clazz = declare([BaseWidget, _WidgetsInTemplateMixin], {
       /* global apiUrl */
@@ -73,7 +73,7 @@ define([
 
       _relatedDef: null,
 
-      c_ResourceManager: null,
+      _ResourceManager: null,
 
       _activeLayerInfoId: null,
 
@@ -123,11 +123,11 @@ define([
 
         this._createUtilitiesUI();
 
-        this.c_ResourceManager = new c_ResourceManager({
+        this._ResourceManager = new _ResourceManager({
           map: this.map,
           nls: this.nls
         });
-        this.c_ResourceManager.setConfig(this.config);
+        this._ResourceManager.setConfig(this.config);
 
         //eg: TabTheme maxmize or minimize
         this.own(topic.subscribe('changeMapPosition', lang.hitch(this, this._onMapPositionChange)));
@@ -229,7 +229,7 @@ define([
           this.loading.placeAt(this.domNode);
           this.loading.show();
 
-          this.c_ResourceManager.updateLayerInfoResources(true)
+          this._ResourceManager.updateLayerInfoResources(true)
           .then(lang.hitch(this, function() {
             if (!this.domNode) {
               return;
@@ -312,7 +312,7 @@ define([
       _processDelayedLayerInfos: function() { // must be invoke after initialize this._layerInfos
         if (this._delayedLayerInfos.length > 0) {
           array.forEach(this._delayedLayerInfos, lang.hitch(this, function(delayedLayerInfo) {
-            this.c_ResourceManager.addLayerInfo(delayedLayerInfo);
+            this._ResourceManager.addLayerInfo(delayedLayerInfo);
           }));
 
           this._delayedLayerInfos = [];
@@ -333,7 +333,7 @@ define([
         if ('added' === changeType) {
           layerInfoSelf.getSupportTableInfo().then(lang.hitch(this, function(supportTableInfo) {
             if (supportTableInfo.isSupportedLayer) {
-              this.c_ResourceManager.addLayerInfo(layerInfoSelf);
+              this._ResourceManager.addLayerInfo(layerInfoSelf);
             }
           }));
         } else if ('removed' === changeType) {
@@ -342,11 +342,11 @@ define([
             this.layerTabPageClose(selfId, true);
           }
 
-          if (this.c_ResourceManager.getLayerInfoById(selfId)) {
-            this.c_ResourceManager.removeLayerInfo(selfId);
+          if (this._ResourceManager.getLayerInfoById(selfId)) {
+            this._ResourceManager.removeLayerInfo(selfId);
           }
-          if (this.c_ResourceManager.getConfigInfoById(selfId)) {
-            this.c_ResourceManager.removeConfigInfo(selfId);
+          if (this._ResourceManager.getConfigInfoById(selfId)) {
+            this._ResourceManager.removeConfigInfo(selfId);
           }
         }
       },
@@ -371,7 +371,7 @@ define([
           len = this.layerTabPages.length;
           for (i = 0; i < len; i++) {
             var paneId = this.layerTabPages[i].paneId;
-            var table = lang.getObject('c_ResourceManager.featureTableSet.' + paneId, false, this);
+            var table = lang.getObject('_ResourceManager.featureTableSet.' + paneId, false, this);
             if (table) {
               var filterObj = table.getFilterObj();
               if (filterObj && esriLang.isDefined(filterObj.expr)) {
@@ -400,8 +400,8 @@ define([
         this.AttributeTableDiv = null;
         this._loadInfoDef = null;
         this._activeLayerInfoId = null;
-        if (this.c_ResourceManager) {
-          this.c_ResourceManager.empty();
+        if (this._ResourceManager) {
+          this._ResourceManager.empty();
         }
         this.inherited(arguments);
       },
@@ -490,7 +490,7 @@ define([
           this.showRefreshing(false);
         }
         html.setStyle(this.domNode, "bottom", this.bottomPosition + "px");
-        if (!this.c_ResourceManager.isEmpty()) {
+        if (!this._ResourceManager.isEmpty()) {
           setTimeout(lang.hitch(this, function() {
             var ngHeight = this._getGridTopSectionHeight();
             var domHeight = html.getStyle(this.domNode, 'height');
@@ -505,12 +505,12 @@ define([
       },
 
       _startQueryOnLayerTab: function(tabId, featureSet) {
-        var layerInfo = this.c_ResourceManager.getLayerInfoById(tabId);
+        var layerInfo = this._ResourceManager.getLayerInfoById(tabId);
         var tabPage = this.getExistLayerTabPage(tabId);
 
         if (layerInfo && tabPage) {
           this.showRefreshing(true);
-          this.c_ResourceManager.getQueryTable(
+          this._ResourceManager.getQueryTable(
           tabId,
           this.config.filterByMapExtent,
           this.config.hideExportButton,
@@ -551,13 +551,13 @@ define([
       },
 
       _startQueryOnRelationTab: function(infoId, relationShipKey, selectedIds, originalInfoId) {
-        var originalInfo = this.c_ResourceManager.getLayerInfoById(originalInfoId);
+        var originalInfo = this._ResourceManager.getLayerInfoById(originalInfoId);
         var tabPage = this.getExistLayerTabPage(infoId);
         if (!(originalInfo && originalInfo.layerObject) || !tabPage) {
           return;
         }
 
-        this.c_ResourceManager.getRelationTable(originalInfoId, relationShipKey,
+        this._ResourceManager.getRelationTable(originalInfoId, relationShipKey,
           false, this.config.hideExportButton, this.config.allowTextSelection)
         .then(lang.hitch(this, function(result) {
           //prevent overwrite by another asynchronous callback
@@ -713,7 +713,7 @@ define([
           );
           // that._activeTableHandles.push(on(that._activeTable,
           //   'row-click', function() {
-          //     var tables = that.c_ResourceManager.featureTableSet;
+          //     var tables = that._ResourceManager.featureTableSet;
           //     for (var p in tables) {
           //       var t = tables[p];
           //       if (t !== that._activeTable) {
@@ -792,7 +792,7 @@ define([
         //We need to startup tabContainer before call addChild method, or it will result in issue #8678
         this.tabContainer.startup();
 
-        var configInfos = this.c_ResourceManager.getConfigInfos();
+        var configInfos = this._ResourceManager.getConfigInfos();
         var len = configInfos.length;
         for (var j = 0; j < len; j++) {
           var configInfo = configInfos[j];
@@ -867,7 +867,7 @@ define([
       },
 
       addNewLayerTab: function(infoId, featureSet) {
-        var layerInfo = this.c_ResourceManager.getLayerInfoById(infoId);
+        var layerInfo = this._ResourceManager.getLayerInfoById(infoId);
         if (!layerInfo) {
           return;
         }
@@ -884,11 +884,11 @@ define([
           this.onOpen();
           // this.tabContainer.selectChild(page);
         } else {
-          if (!this.c_ResourceManager.getConfigInfoById(layerInfo.id)) {
-            this.c_ResourceManager.addConfigInfo(layerInfo);
+          if (!this._ResourceManager.getConfigInfoById(layerInfo.id)) {
+            this._ResourceManager.addConfigInfo(layerInfo);
           }
-          if (!this.c_ResourceManager.getLayerInfoById(layerInfo.id)) {
-            this.c_ResourceManager.addLayerInfo(layerInfo);
+          if (!this._ResourceManager.getLayerInfoById(layerInfo.id)) {
+            this._ResourceManager.addLayerInfo(layerInfo);
           }
           this.onOpen();
 
@@ -905,7 +905,7 @@ define([
       },
 
       addNewRelationTab: function(oids, relationShip, originalInfoId) {
-        var relationshipInfo = this.c_ResourceManager.getRelationShipInfo(relationShip);
+        var relationshipInfo = this._ResourceManager.getRelationShipInfo(relationShip);
         var lInfo = relationShip && relationshipInfo;
         if (!lInfo) {
           return;
@@ -927,11 +927,11 @@ define([
         if (page) {
           lang.mixin(page.params, json);
         } else {
-          if (!this.c_ResourceManager.getConfigInfoById(lInfo.id)) {
-            this.c_ResourceManager.addConfigInfo(lInfo);
+          if (!this._ResourceManager.getConfigInfoById(lInfo.id)) {
+            this._ResourceManager.addConfigInfo(lInfo);
           }
-          if (!this.c_ResourceManager.getLayerInfoById(lInfo.id)) {
-            this.c_ResourceManager.addLayerInfo(lInfo);
+          if (!this._ResourceManager.getLayerInfoById(lInfo.id)) {
+            this._ResourceManager.addLayerInfo(lInfo);
           }
           json.style = "height: 100%; width: 100%; overflow: visible";
           page = new ContentPane(json);
@@ -958,9 +958,9 @@ define([
 
           if (!this.showing) {
             this._openTable().then(lang.hitch(this, function() {
-              var isInResources = !!this.c_ResourceManager.getLayerInfoById(params.layer.id);
+              var isInResources = !!this._ResourceManager.getLayerInfoById(params.layer.id);
               if (!isInResources) {
-                this.c_ResourceManager.updateLayerInfoResources(false)
+                this._ResourceManager.updateLayerInfoResources(false)
                 .then(lang.hitch(this, function() {
                   this._addLayerToTable(params);
                 }));
@@ -969,7 +969,7 @@ define([
               }
             }));
           } else {
-            this.c_ResourceManager.updateLayerInfoResources(false)
+            this._ResourceManager.updateLayerInfoResources(false)
             .then(lang.hitch(this, function() {
               this._addLayerToTable(params);
             }));
@@ -983,7 +983,7 @@ define([
           lang.getObject('layerInfo.id', false, params))) {
           return;
         }
-        var layerInfo = this.c_ResourceManager
+        var layerInfo = this._ResourceManager
           .getLayerInfoById(
             (params.layerInfo && params.layerInfo.id) ||
             (params.layer && params.layer.id)
@@ -1031,8 +1031,8 @@ define([
           if (this.layerTabPages[i] && this.layerTabPages[i].paneId === paneId) {
             // this.featureTableSet
 
-            // var table = that.c_ResourceManager.featureTableSet[paneId];
-            var table = lang.getObject('c_ResourceManager.featureTableSet.' + paneId, false, this);
+            // var table = that._ResourceManager.featureTableSet[paneId];
+            var table = lang.getObject('_ResourceManager.featureTableSet.' + paneId, false, this);
             if (table) {
               var filterObj = table.getFilterObj();
               if (filterObj && esriLang.isDefined(filterObj.expr)) {
@@ -1047,8 +1047,8 @@ define([
               this.layerTabPages.splice(i, 1); // removed contentpane from memory
             }
 
-            this.c_ResourceManager.removeConfigInfo(paneId); // destroy featureTable
-            this.c_ResourceManager.removeLayerInfo(paneId);
+            this._ResourceManager.removeConfigInfo(paneId); // destroy featureTable
+            this._ResourceManager.removeLayerInfo(paneId);
 
             if (len === 1) {
               this._activeLayerInfoId = null;
@@ -1072,7 +1072,7 @@ define([
             if (results) {
               var layerObject = results[0];
               var relatedTableInfos = results[1];
-              this.c_ResourceManager.collectRelationShips(layerInfo, relatedTableInfos);
+              this._ResourceManager.collectRelationShips(layerInfo, relatedTableInfos);
               var ships = layerObject.relationships;
               for (var i = 0, len = ships.length; i < len; i++) {
                 this.addNewRelationTab(featureIds, ships[i], layerInfo.id);
@@ -1085,9 +1085,9 @@ define([
       showRelatedRecordsFromPopup: function(layerInfo, featureIds) {
         if (!this.showing) {
           this._openTable().then(lang.hitch(this, function() {
-            var isInResources = !!this.c_ResourceManager.getLayerInfoById(layerInfo.id);
+            var isInResources = !!this._ResourceManager.getLayerInfoById(layerInfo.id);
             if (!isInResources) {
-              this.c_ResourceManager.updateLayerInfoResources(false)
+              this._ResourceManager.updateLayerInfoResources(false)
               .then(lang.hitch(this, function() {
                 this._processRelatedRecordsFromPopup(layerInfo, featureIds);
               }));
@@ -1096,7 +1096,7 @@ define([
             }
           }));
         } else {
-          this.c_ResourceManager.updateLayerInfoResources(false)
+          this._ResourceManager.updateLayerInfoResources(false)
           .then(lang.hitch(this, function() {
             this._processRelatedRecordsFromPopup(layerInfo, featureIds);
           }));
